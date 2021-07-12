@@ -14,6 +14,14 @@ header {
   font-family: Consolas
 }
 
+table {
+  table-layout: fixed;
+}
+
+th {
+  border-left-style:ridge;
+}
+
 .center {
   background-color:darkred;
   text-align: center;
@@ -29,10 +37,4 @@ header {
   background-color: black;
   color: white;
   font-family: 'Courier New', Courier, monospace;
-}
-
-th {
-  padding-left: 10px;
-  padding-right: 10px;
-  border-left-style:ridge;
 }
