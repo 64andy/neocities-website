@@ -3,38 +3,64 @@
    "how to change link color." */
 body {
   background-color: darkslateblue;
+  background-image: url(/static/animated_stars.gif);
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: "Comic Sans MS", "Papyrus", "Arial";
 }
 
-header {
+h3 {
+  background-color: blue;
+}
+
+nav {
   color: white;
-  font-family: Consolas
+  font-family: Consolas;
+  font-size: small;
 }
 
-table {
+.top-header {
+  vertical-align: middle;
+  width: 100%;
+  background-image: url(/static/led_bounce.gif);
+  background-size: 100%;
+  /* background: repeating-linear-gradient(30deg, red, green, blue, green, red); */
+  padding: 0px;
+  border: 0px;
+  margin: 0px;
+}
+
+.sidebar {
+  width: 150px;
   table-layout: fixed;
-}
-
-th {
-  border-left-style:ridge;
+  height: 100%;
+  text-align: center;
 }
 
 .center {
-  background-color:darkred;
-  text-align: center;
-  width: 900px;
+  text-align:center;
   margin: auto;
 }
 
 .main {
+  margin: auto;
+  display: flex;
+  width: 900px;
+  color: white;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.content {
   border-style: dotted;
   border-radius: 2px;
   box-sizing: border-box;
   border-color:coral;
-  background-color: black;
-  color: white;
-  font-family: 'Courier New', Courier, monospace;
+  background-color:darkred;
+  width: 100%;
+  padding: 10px;
+}
+
+.rainbow-bar {
+  background-image: url(/static/gradient_bar.gif);
 }
