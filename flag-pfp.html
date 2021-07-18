@@ -17,14 +17,21 @@
                 <label for="flag">Select flag</label>
                 <input type="file" id="flag" name="flag" accept="image/*" />
                 <br/>
+
                 <label for="pfp">Select profile pic</label>
                 <input type="file" id="pfp" name="pfp" accept="image/*" />
                 <br/>
+
                 <label for="radius">Set flag radius</label>
-                <input type="range" min="0" max="200" value="10" id="radius" name="radius">
+                <input type="range" min="0" max="200" value="10" id="radius" name="radius" />
                 <label for="radius" id='radius-display'></label>
                 <br/>
-                <button onclick="renderPfp()">MWAHAHAHA</button>
+
+                <label for="cropped">Crop the whole image?</label>
+                <input type="checkbox" name="cropped" id="cropped" checked />
+                <br/>
+                
+                <button onclick="imSane()">Clipping oh no</button>
             </form>
         </div>
     </div>
