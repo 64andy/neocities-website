@@ -4,44 +4,41 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        canvas {
-            border: 5px dashed purple;
-        }
-    </style>
+    <link href="/static/style.css" rel="stylesheet" type="text/css" media="all">
     <title>Kneel for the flag</title>
 </head>
-<body onload="init()">
-    <canvas id="yes" width="400" height="400">
-        <marquee>Canvas isn't working :) I'm not mad</marquee>
-    </canvas>
-    <div style="border: 1px solid seagreen">
-        <form>
-            <label for="flag">Select flag</label>
-            <input type="file" id="flag" name="flag" accept="image/*" />
-            <br/>
-            <label for="pfp">Select profile pic</label>
-            <input type="file" id="pfp" name="pfp" accept="image/*" />
-            <br/>
-            <label for="radius">Set flag radius</label>
-            <input type="range" min="0" max="200" value="10" id="radius" name="radius">
-            <label for="radius" id='radius-display'>
-            <br/>
-            <button onclick="renderPfp()">MWAHAHAHA</button>
-        </form>
+<body onload="init()" class="main">
+    <div id="content">
+        <canvas id="yes" width="400" height="400">
+            <marquee>Canvas isn't working :) I'm not mad</marquee>
+        </canvas>
+        <div style="border: 1px solid seagreen">
+            <form onsubmit="return false">
+                <label for="flag">Select flag</label>
+                <input type="file" id="flag" name="flag" accept="image/*" />
+                <br/>
+                <label for="pfp">Select profile pic</label>
+                <input type="file" id="pfp" name="pfp" accept="image/*" />
+                <br/>
+                <label for="radius">Set flag radius</label>
+                <input type="range" min="0" max="200" value="10" id="radius" name="radius">
+                <label for="radius" id='radius-display'></label>
+                <br/>
+                <button onclick="renderPfp()">MWAHAHAHA</button>
+            </form>
+        </div>
     </div>
-    <p>You know, this could've been a good excuse to learn WebGL.</p>
     <p>
+        You know, this could've been a good excuse to learn WebGL.
+        <br/>
         I know OpenGL2, and have a basic academic understanding of GLSL. I don't know
         how to do it elegantly, I don't know how you combine multiple shaders, but I
         could've made a super bloated fragment shader.
-    </p>
-    <p>
+    <br/>
         Ya know... provide the samplers, if that pixel's in the radius then sample
         the avatar, if it's outside then sample the cos() of the flag coord, that'd
         stretch it nicely.
-    </p>
-    <p>
+    <br/>
         But this is also a learning experience, and I <b>despise</b> the setup
         you need to get it working. GLSL's easy, OpenGL sucks.
     </p>
