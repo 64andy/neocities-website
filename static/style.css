@@ -1,9 +1,17 @@
-/* CSS is how you can add style to your website, such as colors, fonts, and positioning of your
-   HTML content. To learn how to do something, just try searching Google for questions like
-   "how to change link color." */
 body {
-  background-color: darkslateblue;
-  background-image: url(/static/animated_stars.gif);
+  background-color: #ff24a4;
+  background-position: 0 0, 0 0;
+  background-repeat: repeat, repeat;
+  /* background-blend-mode: color-dodge, normal, normal; */
+  /* background-size: 500px 300px, auto, auto; */
+  background-image: /*twinkle url(/static/corruption_yt.gif),*/
+                    /*fg*/  url(/static/stars_fg.gif),
+                    /*bg*/  url(/static/stars_bg.gif);
+  --bg-width: 165px;
+  --bg-height: 190px;
+  --fg-width: 130px;
+  --fg-height: 149px;
+  animation: moving-stars 20.5s infinite linear;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -20,12 +28,18 @@ nav {
   font-size: small;
 }
 
+a {
+  color: lightseagreen;
+}
+a:visited {
+  color: hsl(271, 76%, 70%);
+}
+
 .top-header {
   vertical-align: middle;
   width: 100%;
   background-image: url(/static/led_bounce.gif);
   background-size: 100%;
-  /* background: repeating-linear-gradient(30deg, red, green, blue, green, red); */
   padding: 0px;
   border: 0px;
   margin: 0px;
@@ -61,6 +75,13 @@ nav {
   padding: 10px;
 }
 
-.rainbow-bar {
-  background-image: url(/static/gradient_bar.gif);
+@keyframes moving-stars {
+  0% {background-position:    /*twinkle 0px 2000px,*/
+                              /*fg*/  calc(var(--fg-width)*3) 0px,
+                              /*bg*/  0px 0px;
+  }
+  100% {background-position:  /*twinkle 20px 0px,*/
+                              /*fg*/ 0px calc(var(--fg-height)*2),
+                              /*bg*/ var(--bg-width) var(--bg-height);
+  }
 }
