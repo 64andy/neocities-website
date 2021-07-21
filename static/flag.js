@@ -46,7 +46,6 @@ function init() {
         })
         .then((newFlagImg) => {
             flagCtx.drawImage(newFlagImg, 0, 0, width, height);
-            debugger;
             renderPfp(mainCanvas);
         })
     });
@@ -134,15 +133,15 @@ function clearCanvas(canvas) {
  * Returns an image's pixels as a byte array.
  * It's just the canvas.getImageData function but automated
  * @param {HTMLImageElement} img
- * @returns {ImageData}
+ * @returns {ImageData} An object representing the JS
  */
 function getImagePixels(img, sx, sy, sw, sh) {
     // This is a hack, javascript is a hack, i hate it here, help
     let canvas = document.createElement('canvas');
     let ctx = canvas.getContext('2d');
-    ctx.imageSmoothingEnabled = false; // GL_LINEAR
     canvas.width = width;
     canvas.height = height;
+    ctx.imageSmoothingEnabled = false; // GL_LINEAR
     ctx.drawImage(img, 0, 0, width, height);
 
     let data = ctx.getImageData(sx, sy, sw, sh);
@@ -180,14 +179,15 @@ async function stretchFlagForCircles(img) {
     let oldPixels = getImagePixels(img, 0, 0, w, h).data;
     let newPixels = new Uint8ClampedArray(oldPixels.length);
     let s, t;   // x,y texture coords between [0, 1]
+    let sx, tx; // Offset by sin
     for (let i = 0; i < w; i++) {
         s = i/(w-1);    // See? I remember my graphics class
-        //! s = Math.sin(s*Math.PI);
+        sx = 0.5+(Math.asin(2*s-1))/Math.PI;
         for (let j = 0; j < h; j++) { 
             t = j/(h-1);
-            //! t = Math.sin(t*Math.PI);
+            tx = 0.5+(Math.asin(2*t-1))/Math.PI;
             // console.log(`${i}, ${j} = ${s}, ${t} -> ${(i*w + j)*4}`);
-            let pixel = getPixel(oldPixels, s, t);
+            let pixel = getPixel(oldPixels, sx, tx);
             writePixel(newPixels, pixel, s, t);
         }
     }
@@ -212,11 +212,10 @@ function renderPfp(canvas) {
     // Init: An overall circular clip, kinda represents what it looks like
     console.log("isCropped:", isCropped);
     if (isCropped) {
-        console.log("Setting clip")
         let flagCropPath = new Path2D();
         flagCropPath.arc(width/2, height/2, height/2, 0, 2*Math.PI);
         ctx.clip(flagCropPath);
-    } else console.log("Not setting clip");
+    }
     // Step 1: Draw the flag
     ctx.drawImage(flag, 0, 0, width, height);
     
@@ -225,7 +224,9 @@ function renderPfp(canvas) {
     pfpRadiusClip.arc(width/2, height/2, (height/2)-radius, 0, 2*Math.PI);
     ctx.clip(pfpRadiusClip);
     // Step 2b: Draw the PFP
-    ctx.drawImage(pfp, 0, 0, width, height);
+    // let pythag = radius * Math.SQRT1_2
+    // TODO: Figure out the mathematics of not making this look shit
+    ctx.drawImage(pfp, radius, radius, width-radius/2, height-radius/2);
 }
 
 
