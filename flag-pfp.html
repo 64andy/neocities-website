@@ -14,20 +14,20 @@
         </canvas>
         <div style="border: 1px solid seagreen">
             <form onsubmit="return false">
-                <label for="flag">Select flag</label>
+                <label for="flag">Add flag </label>
                 <input type="file" id="flag" name="flag" accept="image/*" />
                 <br/>
 
-                <label for="pfp">Select profile pic</label>
+                <label for="pfp">Add profile pic </label>
                 <input type="file" id="pfp" name="pfp" accept="image/*" />
                 <br/>
 
-                <label for="radius">Set flag radius</label>
+                <label for="radius">Flag radius </label>
                 <input type="range" min="0" max="200" value="10" id="radius" name="radius" />
                 <label for="radius" id='radius-display'></label>
                 <br/>
 
-                <label for="cropped">Crop the whole image?</label>
+                <label for="cropped">Crop the whole image? </label>
                 <input type="checkbox" name="cropped" id="cropped" checked />
                 <br/>
                 
@@ -37,15 +37,15 @@
     </div>
     <p>
         You know, this could've been a good excuse to learn WebGL.
-        <br/>
+    <br><br>
         I know OpenGL2, and have a basic academic understanding of GLSL. I don't know
         how to do it elegantly, I don't know how you combine multiple shaders, but I
         could've made a super bloated fragment shader.
-    <br/>
+    <br><br>
         Ya know... provide the samplers, if that pixel's in the radius then sample
         the avatar, if it's outside then sample the cos() of the flag coord, that'd
         stretch it nicely.
-    <br/>
+    <br><br>
         But this is also a learning experience, and I <b>despise</b> the setup
         you need to get it working. GLSL's easy, OpenGL sucks.
     </p>
