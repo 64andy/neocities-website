@@ -140,6 +140,7 @@ function getImagePixels(img, sx, sy, sw, sh) {
     // This is a hack, javascript is a hack, i hate it here, help
     let canvas = document.createElement('canvas');
     let ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false; // GL_LINEAR
     canvas.width = width;
     canvas.height = height;
     ctx.drawImage(img, 0, 0, width, height);
@@ -170,7 +171,7 @@ async function stretchFlagForCircles(img) {
         return px;
     }
     const writePixel = (src, px, i, j) => {
-        let pos = (i*w + j) * 4;
+        let pos = getPos(s, t);
         for (let i = 0; i < px.length; i++) {
             src[pos+i] = px[i];
         }
