@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="/static/style.css" rel="stylesheet" type="text/css" media="all">
+    <link href="/css/style.css" rel="stylesheet" type="text/css" media="all">
     <title>Kneel for the flag</title>
 </head>
 <body onload="init()" class="main">
     <div id="content">
         <canvas id="yes" width="400" height="400">
-            <marquee>Canvas isn't working :) I'm not mad</marquee>
+            <marquee>Sorry, your browser doesn't support canvas, or I broke everything</marquee>
         </canvas>
         <div style="border: 1px solid seagreen">
             <form onsubmit="return false">
@@ -40,10 +40,12 @@
         </div>
     </div>
     <p>
-        On today's episode of "You should've learned WebGL
-        instead of manual pixel manipulation".<br>
+        On today's episode of "You should've used WebGL
+        instead of individually manipulating pixels".
+        <br/><br/>
+        TODO: Implement allowing multiple flags
     </p>
 
-    <script src="/static/flag.js"/>
+    <script src="/js/flag.js"/>
 </body>
 </html>
