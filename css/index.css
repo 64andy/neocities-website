@@ -1,0 +1,32 @@
+@keyframes slapped {
+  0% {transform: perspective(3cm) rotateY(0deg);}
+  30% {transform: perspective(4cm) rotateY(-50deg);}
+  100% {transform: perspective(3cm) rotateY(720deg);}
+}
+  
+.handSlap {
+  animation-name: slapped;
+  animation-duration: 1.5s;
+  animation-iteration-count: 1;
+  animation-timing-function: cubic-bezier(.17,.67,.62,1.1);
+}
+
+@keyframes scroll-left {
+    0% {right: 20px;}
+    100% {right: 0%;}
+}
+@keyframes scroll-right {
+    0% {left: 20px;}
+    100% {left: 0%;}
+}
+
+/* ! WARNING: THIS IS ALL BROKEN */
+
+.top-header {
+    vertical-align: middle;
+    width: 100%;
+    margin: auto;
+    /* overflow: hidden; */
+    background-image: url(/img/led_bounce.gif); /* For testing */
+    background-size: 100%;
+}

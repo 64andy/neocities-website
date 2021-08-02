@@ -1,25 +1,23 @@
 body {
-  background-color: #ff24a4;
+  background-color: #111;
   background-position: 0 0, 0 0;
   background-repeat: repeat, repeat;
   background-blend-mode: color-dodge, normal, normal;
   background-size: 500px 300px, 195px 223px, auto;
-  background-image: /*twinkle*/ url(/static/corruption_grey_slow.gif),
-                    /*fg*/  url(/static/stars_fg.gif),
-                    /*bg*/  url(/static/stars_bg.gif);
+  background-image: /*twinkle*/ url(/img/corruption_grey_slow.gif),
+                    /*fg*/  url(/img/stars_fg.gif),
+                    /*bg*/  url(/img/stars_bg.gif);
   --bg-width: 165px;
   --bg-height: 190px;
   --fg-width: 130px;
   --fg-height: 149px;
-  animation: moving-stars 20s infinite linear;
+  animation: moving-stars 30s infinite linear;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: "Comic Sans MS", "Papyrus", "Arial";
-}
 
 h3 {
   background-color: blue;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
 }
 
 nav {
@@ -39,16 +37,6 @@ canvas {
   border: 5px dashed purple;
 }
 
-.top-header {
-  vertical-align: middle;
-  width: 100%;
-  background-image: url(/static/led_bounce.gif);
-  background-size: 100%;
-  padding: 0px;
-  border: 0px;
-  margin: 0px;
-}
-
 .sidebar {
   width: 150px;
   table-layout: fixed;
@@ -65,8 +53,9 @@ canvas {
   margin: auto;
   display: flex;
   width: 900px;
-  color: white;
-  font-family: 'Courier New', Courier, monospace;
+  color: hsl(45, 100%, 50%);
+  font-family: Consolas, 'Courier New', Courier, monospace;
+  font-size: 90%;
 }
 
 #content {
@@ -74,21 +63,11 @@ canvas {
   border-radius: 2px;
   box-sizing: border-box;
   border-color:coral;
-  background-color:darkred;
+  background-color:#202;
   width: 100%;
   padding: 10px;
 }
 
-@keyframes slapped {
-  from {transform: perspective(3cm) rotateY(0deg);}
-  to {transform: perspective(3cm) rotateY(360deg)}
-}
-.hand {
-  animation-name: backscroll;
-  animation-duration: 2s;
-  animation-iteration-count: infinite;
-  animation-timing-function: linear;
-}
 @keyframes moving-stars {
   0% {background-position:    /*twinkle*/ 0px 200px,
                               /*fg*/  calc(var(--fg-width)*3) 0px,
