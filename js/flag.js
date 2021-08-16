@@ -255,13 +255,3 @@ function renderPfp(canvas) {
     // Step 2b: Draw the PFP
     ctx.drawImage(pfp, radius, radius, width-radius*2, height-radius*2);
 }
-
-
-
-
-
-function imSane() {
-    mainCtx.fillStyle = "#ff0";
-    mainCtx.fillRect(0, 0, 250, 250);
-    mainCtx.closePath();
-}

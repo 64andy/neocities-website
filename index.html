@@ -8,7 +8,7 @@
   <title>Andy's existence</title>
 </head>
 
-<body>
+<body onload="init()">
   <div class="main">
     <nav class="sidebar">
       <h3>
@@ -37,15 +37,17 @@
     </nav>
     <div id="content">
       <link href="/css/index.css" rel="stylesheet" type="text/css" media="all">
-      <div class="center top-header">
-          <h1 class="console-typed">Welcome to my&nbsp;
-              <span class="console-highlight">cyber space</span></h1>
+      <div class="top-header">
+          <h1 class="center console-typed" id="console-banner">
+            Welcome to the friend zone...
+          </h1>
       </div>
-
-      <p class="center"><b>Warning</b>: This entire site is a WIP I might not finish, who knows</p>
+      <br>
+      <p class="center">
+        <b>Warning</b>: This entire site is a WIP I might not finish, who knows
+      </p>
       <p>Slap test:</p>
-      <img src="/img/neocities.png"
-      onclick="this.classList.toggle('handSlap'); setTimeout(()=>this.classList.remove('handSlap'),1500)">
+      <img src="/img/neocities.png" onclick="getSlapped(this)">
       <p>OK so the TL;DR:</p>
 
       <ul>
@@ -60,6 +62,7 @@
     </div>
   </div>
   <img src="/img/neocities.png" class="center">
+  <script src="/js/index.js"></script>
 </body>
 
 </html>

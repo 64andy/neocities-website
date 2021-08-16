@@ -8,11 +8,12 @@
     <title>Kneel for the flag</title>
 </head>
 <body onload="init()" class="main">
+    <link href="/css/flag.css" rel="stylesheet" type="text/css" media="all">
     <div id="content">
         <canvas id="yes" width="400" height="400">
             <marquee>Sorry, your browser doesn't support canvas, or I broke everything</marquee>
         </canvas>
-        <div style="border: 1px solid seagreen">
+        <div class="flag-input">
             <form onsubmit="return false">
                 <label for="pfp">Add profile pic </label>
                 <input type="file" id="pfp" name="pfp" accept="image/*"
@@ -33,9 +34,6 @@
                 <label for="cropped">Crop the whole image? </label>
                 <input type="checkbox" name="cropped" id="cropped" checked
                     onchange="formEvents.updateFlagCrop()"/>
-                <br/>
-                
-                <button onclick="imSane()">Clipping oh no</button>
             </form>
         </div>
     </div>
@@ -46,6 +44,6 @@
         TODO: Implement allowing multiple flags
     </p>
 
-    <script src="/js/flag.js"/>
+    <script src="/js/flag.js"></script>
 </body>
 </html>

@@ -1,3 +1,5 @@
+/* / Getting slapped / */
+
 @keyframes slapped {
   0% {transform: perspective(3cm) rotateY(0deg);}
   30% {transform: perspective(4cm) rotateY(-50deg);}
@@ -20,13 +22,35 @@
     100% {left: 0%;}
 }
 
-/* ! WARNING: THIS IS ALL BROKEN */
+/* / Console typing / */
 
 .top-header {
     vertical-align: middle;
+    text-align: start;
     width: 100%;
     margin: auto;
     /* overflow: hidden; */
-    background-image: url(/img/led_bounce.gif); /* For testing */
     background-size: 100%;
+}
+
+.console-typed {
+  color: hsl(45, 100%, 50%);
+}
+.console-typed-highlight {
+  background-color: hsl(45, 100%, 50%);
+  color: black;
+}
+
+.console-blinky {
+  animation: blinker 1500ms steps(1, jump-end) infinite;
+}
+
+@keyframes blinker {
+  from, to {
+    color: hsl(45, 100%, 50%);
+  }
+  50% {
+    background-color: hsl(45, 100%, 50%);
+    color: black;
+  }
 }
