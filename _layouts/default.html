@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="/css/style.css" rel="stylesheet" type="text/css" media="all">
+  <title>{{page.title}}</title>
+</head>
+
+<body onload="init()" class="main">
+  <nav class="sidebar">
+    {% include sidebar.html %}
+  <div id="content">
+    {{- content -}}
+  </div>
+</body>
+
+</html>

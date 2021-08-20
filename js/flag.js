@@ -64,12 +64,12 @@ var formEvents = {
      * and applies it to the flag canvas
      */
     applyFlag() {
+        let targetCtx = flagCtx;
         let file = elems.flagUpload.files[0];
         if (file === undefined) {
             console.error("applyFlag: No pic uploaded")
             return;
         }
-        let targetCtx = flagCtx;
 
         readImage(file)
         .then((flagImg) => {
