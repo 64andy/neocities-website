@@ -3,3 +3,7 @@
     padding: 4px;
     width: 400px
 }
+
+.flex {
+    display: flex;
+}

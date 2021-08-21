@@ -1,20 +1,3 @@
-/* / Getting slapped / */
-
-@keyframes slapped {
-  0% {transform: perspective(3cm) rotateY(0deg);}
-  30% {transform: perspective(4cm) rotateY(-50deg);}
-  100% {transform: perspective(3cm) rotateY(720deg);}
-}
-  
-.handSlap {
-  animation-name: slapped;
-  animation-duration: 1.5s;
-  animation-iteration-count: 1;
-  animation-timing-function: cubic-bezier(.17,.67,.62,1.1);
-}
-
-/* / Console typing / */
-
 .top-header {
     vertical-align: middle;
     text-align: start;
@@ -22,26 +5,4 @@
     margin: auto;
     /* overflow: hidden; */
     background-size: 100%;
-}
-
-.console-typed {
-  color: hsl(45, 100%, 50%);
-}
-.console-typed-highlight {
-  background-color: hsl(45, 100%, 50%);
-  color: black;
-}
-
-.console-blinky {
-  animation: blinker 1500ms steps(1, jump-end) infinite;
-}
-
-@keyframes blinker {
-  from, to {
-    color: hsl(45, 100%, 50%);
-  }
-  50% {
-    background-color: hsl(45, 100%, 50%);
-    color: rgba(0,0,0,1);
-  }
 }

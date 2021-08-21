@@ -3,36 +3,39 @@ layout: default
 title: Kneel for the flag
 ---
 
-<link href="/css/flag.css" rel="stylesheet" type="text/css" media="all">
-<div id="content">
-  <canvas id="yes" width="400" height="400">
-    <marquee>Sorry, your browser doesn't support canvas, or I broke everything</marquee>
-  </canvas>
-  <div class="flag-input">
-    <form onsubmit="return false">
-      <label for="pfp">Add profile pic </label>
-      <input type="file" id="pfp" name="pfp" accept="image/*" onchange="formEvents.applyPfp()" />
-      <br />
+<div class="flex">
+  <div>
+    <canvas id="yes" width="400" height="400">
+      <marquee>Sorry, your browser doesn't support canvas, or I broke everything</marquee>
+    </canvas>
+    <div class="flag-input">
+      <form onsubmit="return false">
+        <label for="pfp">Add profile pic </label>
+        <input type="file" id="pfp" name="pfp" accept="image/*" onchange="formEvents.applyPfp()" />
+        <br />
 
-      <label for="flag">Add flag </label>
-      <input type="file" id="flag" name="flag" accept="image/*" onchange="formEvents.applyFlag()" />
-      <br />
+        <label for="flag">Add flag </label>
+        <input type="file" id="flag" name="flag" accept="image/*" onchange="formEvents.applyFlag()" />
+        <br />
 
 
-      <label for="radius">Flag radius </label>
-      <input type="range" min="0" max="100" value="10" id="radius" name="radius" oninput="formEvents.changeRadius()" />
-      <label for="radius" id='radius-display'></label>
-      <br />
-      <label for="cropped">Crop the whole image? </label>
-      <input type="checkbox" name="cropped" id="cropped" checked onchange="formEvents.updateFlagCrop()" />
-    </form>
+        <label for="radius">Flag radius </label>
+        <input type="range" min="0" max="100" value="10" id="radius" name="radius"
+          oninput="formEvents.changeRadius()" />
+        <label for="radius" id='radius-display'></label>
+        <br />
+        <label for="cropped">Crop the whole image? </label>
+        <input type="checkbox" name="cropped" id="cropped" checked onchange="formEvents.updateFlagCrop()" />
+      </form>
+    </div>
   </div>
+  <p>
+    On today's episode of "You should've used WebGL
+    instead of individually manipulating pixels".
+    <br /><br />
+    TODO: Implement allowing multiple flags
+  </p>
 </div>
-<p>
-  On today's episode of "You should've used WebGL
-  instead of individually manipulating pixels".
-  <br /><br />
-  TODO: Implement allowing multiple flags
-</p>
 
+<link href="/css/flag.css" rel="stylesheet" type="text/css" media="all">
 <script src="/js/flag.js"></script>

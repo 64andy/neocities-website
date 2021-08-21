@@ -8,12 +8,17 @@
   <title>{{page.title}}</title>
 </head>
 
-<body onload="init()" class="main">
-  <nav class="sidebar">
-    {% include sidebar.html %}
-  <div id="content">
-    {{- content -}}
+<body onload="init()">
+  <div class="main">
+    <nav class="sidebar">
+      {% include sidebar.html %}
+    </nav>
+    <div id="content">
+      {{- content -}}
+    </div>
   </div>
+  <!-- <img src="/img/neocities.png" class="center"> -->
 </body>
+
 
 </html>

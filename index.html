@@ -9,7 +9,7 @@ title: Andy's Existence
 <link href="/css/index.css" rel="stylesheet" type="text/css" media="all">
 <div class="top-header">
   <h1 class="center console-typed" id="console-banner">
-    Welcome to the friend zone...
+    Hey friend, welcome to the friend zone :D
   </h1>
 </div>
 <br>
@@ -23,14 +23,28 @@ title: Andy's Existence
 <ul>
   <li>Hi I'm Andy, I'm a uni student, CS</li>
   <li>I'm comfortable with Python, still getting the hang of HTML/CSS/JS</li>
-  <li>Made 3 dead gimmick bots, all dead</li>
-  <li>This message is here to remind myself to learn unity</li>
+  <li>Made 3 dead gimmick bots, all dead,
+    <a href="https://github.com/{{site.github_username}}"
+    target="_blank" rel="noopener noreferrer">
+      check 'em
+    </a>
+  </li>
+  <li>This message is here to remind myself to learn Unity</li>
   <li>... and to get your life together</li>
-  <li>Hey do you think ferrets are cute? Because someone think i'm weird for constantly showing them pics of them all
-    the time</li>
+  <li>Hey do you think ferrets are cute? Because someone think
+       i'm weird for constantly showing them pics of them all
+       the time
+  </li>
 </ul>
 
-</div>
-</div>
-<img src="/img/neocities.png" class="center">
-<script src="/js/index.js"></script>
+<script src="/js/misc.js"></script>
+  <script>
+    function init() {
+      typeOutText('console-banner', /*elem_id:*/
+                  40,  /*ms:*/
+                  6,  /*slowCoeff:*/
+                  true,  /*isCentered:*/
+                  true, /*endWithCursor*/
+      );
+    }
+  </script>

@@ -1,13 +1,21 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Not Found</title>
-    <link href="/static/style.css" rel="stylesheet" type="text/css" media="all">
-  </head>
-  <body>
-    <h1>Page Not Found</h1>
-    <p>The requested page was not found.</p>
-  </body>
-</html>
+---
+layout: default
+title: help im lost
+---
+<h1>
+  <span id="console-banner">&nbsp;</span>
+</h1>
+<p class="centre">The requested page was not found.</p>
+<script src="/js/misc.js"></script>
+<script>
+  function init() {
+    document.getElementById('console-banner').innerText =
+        `| '${location.pathname}' not found`
+    typeOutText('console-banner', /*elem_id:*/
+                40,     /*ms:*/
+                1,    /*slowCoeff:*/
+                false,  /*isCentered:*/
+                true,   /*endWithCursor*/
+    );
+  }
+</script>
