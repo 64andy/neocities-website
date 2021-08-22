@@ -2,20 +2,81 @@
 layout: default
 title: help im lost
 ---
+<style>
+
+@keyframes wiggle {
+  from {transform: rotate(-15deg);}
+  to {transform: rotateY(-40deg) rotateZ(25deg);}
+}
+@keyframes fade-in {
+  from {opacity: 0%;}
+  to {opacity: 100%;}
+}
+
+  .jim {
+    margin-left: 284px;
+    width: 100px;
+    height: 100px;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    -ms-interpolation-mode: nearest-neighbor;
+    animation: wiggle 1500ms steps(5) alternate infinite;
+  }
+  .hidden {visibility: hidden;}
+
+  .jim-speak {
+    font-family: 'Courier New', Courier, monospace;
+    color: red;
+  }
+
+  .killjoy {
+    color: aqua;
+  }
+</style>
 <h1>
-  <span id="console-banner">&nbsp;</span>
+  <span id="line1">&nbsp;</span>
 </h1>
-<p class="centre">The requested page was not found.</p>
+<img src="/img/jim.png" alt="Hello Jim :)" id="jim" class="jim hidden" />
+<h1>
+  <i><b><span id="line2" class="jim-speak">&nbsp;</span></b></i>
+</h1>
+<h1>
+  <span id="line3">&nbsp;</span>
+</h1>
+<a href="/"><i><p class="centre killjoy" id="line4">
+</p></i></a>
 <script src="/js/misc.js"></script>
 <script>
-  function init() {
-    document.getElementById('console-banner').innerText =
-        `| '${location.pathname}' not found`
-    typeOutText('console-banner', /*elem_id:*/
-                40,     /*ms:*/
-                1,    /*slowCoeff:*/
-                false,  /*isCentered:*/
-                true,   /*endWithCursor*/
+  async function write(id, text, ms, center, trail) {
+    document.getElementById(id).innerText = text;
+    await typeOutText(id, ms, 5, center, trail);
+  }
+
+  async function init() {
+    let jim = document.getElementById('jim')
+    await write('line1',
+                `> Ok so this '${location.pathname}' thing was a scam,
+                but on the plus side, I found this little guy`,
+                35
     );
+    await sleep(200);
+    jim.classList.remove('hidden');
+    await sleep(1800);
+    await write('line2',
+                "#__$BL4-A\\x01RG|H|-*|/\\..",
+                150
+    );
+    await sleep(1500);
+    await write('line3',
+                "> It's our pet now :3 I'm keeping it",
+                45
+    );
+    await sleep(500);
+    await write('line4',
+                `*We're not keeping her, get back to work*`,
+                80,
+                true,
+                true)
   }
 </script>

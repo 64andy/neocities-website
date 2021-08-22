@@ -2,9 +2,9 @@ html {
   background-color: #111;
   background-position: 0 0, 0 0;
   background-repeat: repeat, repeat;
-  background-blend-mode: color-dodge, normal, normal;
+  background-blend-mode: multiply, normal, normal;
   background-size: 500px 300px, 195px 223px, auto;
-  background-image: /*twinkle*/ url(/img/corruption_grey_slow.gif),
+  background-image: /*twinkle*/ repeating-linear-gradient(90deg, #2e1770, #000 1%, #a00842 2.5%),
                     /*fg*/  url(/img/stars_fg.gif),
                     /*bg*/  url(/img/stars_bg.gif);
   --bg-width: 165px;
@@ -15,8 +15,8 @@ html {
 }
 
 
-h3 {
-  background: radial-gradient(farthest-side, #800060, #800060, transparent);
+nav h3 {
+  background: radial-gradient(farthest-side, #800060d0, #800060b0, transparent);
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
 }
 
@@ -56,6 +56,8 @@ canvas {
   color: hsl(45, 100%, 50%);
   font-family: Consolas, 'Courier New', Courier, monospace;
   font-size: 90%;
+  /* background-blend-mode: color-burn;
+  background-image: radial-gradient(ellipse at center, #fff, #000); */
 }
 
 #content {
