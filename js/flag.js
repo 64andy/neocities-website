@@ -1,3 +1,5 @@
+var ready = false;
+
 const mainCanvas = document.getElementById("yes");
 /** @type {CanvasRenderingContext2D} */
 const mainCtx = mainCanvas.getContext("2d");
@@ -10,13 +12,20 @@ var isCropped = true;
 
 // Images
 /** @type {HTMLCanvasElement} */
-const flag = document.createElement('canvas');
-flag.width = width;
-flag.height = height;
+const leftFlag = document.createElement('canvas');
+leftFlag.width = width;
+leftFlag.height = height;
+/** @type {HTMLCanvasElement} */
+const rightFlag = document.createElement('canvas');
+rightFlag.width = width;
+rightFlag.height = height;
 
 /** @type {CanvasRenderingContext2D} */
-const flagCtx = flag.getContext('2d');
-flagCtx.imageSmoothingEnabled = false;  // GL_LINEAR
+const leftFlagCtx = leftFlag.getContext('2d');
+leftFlagCtx.imageSmoothingEnabled = false;  // Prevents blur
+/** @type {CanvasRenderingContext2D} */
+const rightFlagCtx = rightFlag.getContext('2d');
+rightFlagCtx.imageSmoothingEnabled = false;  // GL_LINEAR
 
 
 /** @type {HTMLCanvasElement} */
@@ -29,7 +38,8 @@ const pfpCtx = pfp.getContext('2d');
 
 // The elements i'd need to access
 var elems = {
-    flagUpload: document.getElementById('flag'),
+    leftFlagUpload: document.getElementById('left-flag'),
+    rightFlagUpload: document.getElementById('right-flag'),
     pfpUpload: document.getElementById('pfp'),
     radiusChange: document.getElementById('radius'),
     cropCheckbox: document.getElementById('cropped'),
@@ -46,28 +56,33 @@ var formEvents = {
     applyPfp() {
         let file = elems.pfpUpload.files[0];
         if (file === undefined) {
-            console.error("applyPfp: No pic uploaded")
+            console.warn("applyPfp: No pic uploaded yet")
             return;
         }
         let targetCtx = pfpCtx;
         readImage(file)
         .then((pfpImg) => {
             targetCtx.drawImage(pfpImg, 0, 0, width, height);
-            renderPfp(mainCanvas);
+            if (ready) renderPfp(mainCanvas);
         })
         .catch((err) => {
             console.error("Error reading the profile pic:", err);
         });
     },
+
+    applyLeftFlag() {
+        formEvents.applyFlag(leftFlagCtx, elems.leftFlagUpload.files[0]);
+    },
+    applyRightFlag() {
+        formEvents.applyFlag(rightFlagCtx, elems.rightFlagUpload.files[0]);
+    },
     /**
      * Reads the file, parses it as an image, then does the flag stretch,
      * and applies it to the flag canvas
      */
-    applyFlag() {
-        let targetCtx = flagCtx;
-        let file = elems.flagUpload.files[0];
+    applyFlag(ctx, file) {
         if (file === undefined) {
-            console.error("applyFlag: No pic uploaded")
+            console.warn("applyFlag: No pic uploaded yet");
             return;
         }
 
@@ -79,31 +94,20 @@ var formEvents = {
             console.error("Error reading the flag image:", err);
         })
         .then((newFlagImg) => {
-            targetCtx.drawImage(newFlagImg, 0, 0, width, height);
-            renderPfp(mainCanvas);
+            ctx.drawImage(newFlagImg, 0, 0, width, height);
+            if (ready) renderPfp(mainCanvas);
         });
     },
 
     changeRadius() {
         let rad = elems.radiusChange.value;
         updateRadius(rad);
-        renderPfp(mainCanvas);
+        if (ready) renderPfp(mainCanvas);
     },
     updateFlagCrop() {
         isCropped = elems.cropCheckbox.checked;
-        renderPfp(mainCanvas);
+        if (ready) renderPfp(mainCanvas);
     },
-}
-
-
-
-function init() {
-    // Save the initial context state because clips can't be removed otherwise
-    mainCtx.save();
-    // Trigger the events on the forms because browsers remember
-    for (const name in formEvents) {
-        formEvents[name]?.call()
-    }
 }
 
 
@@ -231,11 +235,17 @@ async function stretchFlagForCircles(img) {
 }
 
 function renderPfp(canvas) {
+    if (!ready) {
+        console.warn("Won't render, not properly initialized");
+        return;
+    }
+
     clearCanvas(canvas);
 
     /** @type {CanvasRenderingContext2D} */
     let ctx = canvas.getContext('2d');
     ctx.font = "italic small-caps 30px Comic Sans MS";
+    ctx.fillStyle = "white";
     ctx.fillText("Sup\n>:)", 150, 200);
     ctx.fillText("Add something", 90, 250);
 
@@ -246,12 +256,29 @@ function renderPfp(canvas) {
         ctx.clip(flagCropPath);
     }
     // Step 1: Draw the flag
-    ctx.drawImage(flag, 0, 0, width, height);
-    
+    ctx.drawImage(leftFlag, 0, 0, width, height);
+    ctx.drawImage(rightFlag,
+                    width/2, 0,     // sx, sy
+                    width, height,  // sw, sh
+                    width/2, 0,     // dx, dy
+                    width, height); // dw, dh
     // Step 2a: Image clip
     let pfpRadiusClip = new Path2D();
     pfpRadiusClip.arc(width/2, height/2, (height/2)-radius, 0, 2*Math.PI);
     ctx.clip(pfpRadiusClip);
     // Step 2b: Draw the PFP
     ctx.drawImage(pfp, radius, radius, width-radius*2, height-radius*2);
+}
+
+
+function init() {
+    // Save the initial context state because clips can't be removed otherwise
+    mainCtx.save();
+    // Trigger the events on the forms because browsers can remember on refresh
+    for (const name in formEvents) {
+        formEvents[name]?.call()
+    }
+
+    ready = true;
+    renderPfp(mainCanvas);
 }
