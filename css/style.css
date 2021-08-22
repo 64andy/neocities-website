@@ -16,7 +16,7 @@ html {
 
 
 h3 {
-  background-color: blue;
+  background: radial-gradient(farthest-side, #800060, #800060, transparent);
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
 }
 
@@ -30,7 +30,7 @@ a {
   color: lightseagreen;
 }
 a:visited {
-  color: hsl(271, 76%, 70%);
+  color: hsl(219, 76%, 70%);
 }
 
 canvas {

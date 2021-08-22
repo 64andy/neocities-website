@@ -25,8 +25,7 @@ description: >- # this means to ignore newlines until "baseurl:"
   pretty, smart, big, little, wait no I don't think that's it...
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://64andy.neocities.com"
-twitter_username: 64andy2000
-github_username:  64andy2000
+replit_username: 64andy2000
 
 # Build settings
 plugins:
