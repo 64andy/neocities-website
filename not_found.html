@@ -56,8 +56,8 @@ title: help im lost
   async function init() {
     let jim = document.getElementById('jim')
     await write('line1',
-                `> Ok so this '${location.pathname}' thing was a scam,
-                but on the plus side, I found this little guy`,
+                `> Ok so this '${location.pathname}' thing was a scam, `
+                +`but on the plus side, I found this little guy`,
                 35
     );
     await sleep(200);

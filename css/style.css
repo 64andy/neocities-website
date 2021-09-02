@@ -2,9 +2,9 @@ html {
   background-color: #111;
   background-position: 0 0, 0 0;
   background-repeat: repeat, repeat;
-  background-blend-mode: multiply, normal, normal;
+  background-blend-mode: overlay, normal, normal;
   background-size: 500px 300px, 195px 223px, auto;
-  background-image: /*twinkle*/ repeating-linear-gradient(90deg, #2e1770, #000 1%, #a00842 2.5%),
+  background-image: /*twinkle*/ repeating-linear-gradient(0deg, #0cc, #001 0.5%, #0c0 1.5%),
                     /*fg*/  url(/img/stars_fg.gif),
                     /*bg*/  url(/img/stars_bg.gif);
   --bg-width: 165px;
@@ -71,19 +71,19 @@ canvas {
 }
 
 @keyframes moving-stars {
-  0% {background-position:    /*twinkle*/ 0px 200px,
+  0% {background-position:    /*twinkle*/ 0px 0px,
                               /*fg*/  calc(var(--fg-width)*3) 0px,
                               /*bg*/  0px 0px;
   }
-  49.99% {background-position:/*twinkle*/ 20px 0px,
+  49.99% {background-position:/*twinkle*/ 0px 0px,
                               /*fg*/ 0px calc(var(--fg-height)*2),
                               /*bg*/ calc(var(--bg-width)/2) calc(var(--bg-height)/2);
   }
-  50% {background-position:    /*twinkle*/ 0px 200px,
+  50% {background-position:    /*twinkle*/ 0px 0px,
                               /*fg*/  calc(var(--fg-width)*3) var(--fg-height),
                               /*bg*/  calc(var(--bg-width)/2) calc(var(--bg-height)/2);
   }
-  100% {background-position:  /*twinkle*/ 20px 0px,
+  100% {background-position:  /*twinkle*/ 0px 0px,
                               /*fg*/ 0px calc(var(--fg-height)*2),
                               /*bg*/ var(--bg-width) var(--bg-height);
   }
