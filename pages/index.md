@@ -4,6 +4,7 @@
 # https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 layout: default
 title: Andy's Existence
+permalink: /
 ---
 
 <link href="/css/index.css" rel="stylesheet" type="text/css" media="all">
@@ -11,30 +12,16 @@ title: Andy's Existence
   <h1 class="center console-typed" id="console-banner">
     Hey friend, welcome to the friend zone :D
   </h1>
+  <br/>
 </div>
-<br>
 <p class="center">
-  <b>Warning</b>: This entire site is a WIP I might not finish, who knows
+  **Warning**: This entire site is a WIP I might not finish, who knows
 </p>
 <p>Slap test:</p>
 <img src="/img/neocities.png" onclick="getSlapped(this)">
-<p>OK so the TL;DR:</p>
 
-<ul>
-  <li>Hi I'm Andy, I'm a uni student, CS</li>
-  <li>I'm comfortable with Python, still getting the hang of HTML/CSS/JS</li>
-  <li>Honestly I haven't used Github through the years, I used
-    <a href="https://replit.com/@{{site.replit_username}}" target="_blank" rel="noopener noreferrer">
-      repl.it
-    </a>
-  </li>
-  <li>This message is here to remind myself to learn Unity</li>
-  <li>... and to get your life together</li>
-  <li>Hey do you think ferrets are cute? Because someone think
-    i'm weird for constantly showing them pics of them all
-    the time
-  </li>
-</ul>
+
+
 
 <script src="/js/misc.js"></script>
 <script>

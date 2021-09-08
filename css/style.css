@@ -4,7 +4,7 @@ html {
   background-repeat: repeat, repeat;
   background-blend-mode: overlay, normal, normal;
   background-size: 500px 300px, 195px 223px, auto;
-  background-image: /*twinkle*/ repeating-linear-gradient(0deg, #0cc, #001 0.5%, #0c0 1.5%),
+  background-image: /*scan lines*/ repeating-linear-gradient(0deg, #0cc, #001 0.5%, #0c0 1.5%),
                     /*fg*/  url(/img/stars_fg.gif),
                     /*bg*/  url(/img/stars_bg.gif);
   --bg-width: 165px;
@@ -35,6 +35,10 @@ a:visited {
 
 canvas {
   border: 5px dashed purple;
+}
+
+ul {
+  padding-left: 15px;
 }
 
 .sidebar {
