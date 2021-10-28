@@ -57,11 +57,19 @@ ul {
   margin: auto;
   display: flex;
   width: 900px;
-  color: hsl(45, 100%, 50%);
+  color: hsl(45, 60%, 60%);
   font-family: Consolas, 'Courier New', Courier, monospace;
   font-size: 90%;
   /* background-blend-mode: color-burn;
   background-image: radial-gradient(ellipse at center, #fff, #000); */
+}
+
+.main em, i {
+  color: hsl(25, 100%, 50%);
+}
+
+.main strong, b {
+  color: hsl(93, 100%, 50%)
 }
 
 #content {
