@@ -5,6 +5,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="/css/style.css" rel="stylesheet" type="text/css" media="all">
+  {% if page.bg_image %}
+    <script>
+      document.getElementsByTagName('html')[0].style.backgroundImage = 'url("{{ page.bg_image }}")';
+    </script>
+  {% else %}
+    <link href="/css/default-background.css" rel="stylesheet" type="text/css" media="all">
+  {% endif %}
   <title>{{page.title}}</title>
 </head>
 

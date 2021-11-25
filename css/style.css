@@ -1,19 +1,3 @@
-html {
-  background-color: #111;
-  background-position: 0 0, 0 0;
-  background-repeat: repeat, repeat;
-  background-blend-mode: overlay, normal, normal;
-  background-size: 500px 300px, 195px 223px, auto;
-  background-image: /*scan lines*/ repeating-linear-gradient(0deg, #0cc, #001 0.5%, #0c0 1.5%),
-                    /*fg*/  url(/img/stars_fg.gif),
-                    /*bg*/  url(/img/stars_bg.gif);
-  --bg-width: 165px;
-  --bg-height: 190px;
-  --fg-width: 130px;
-  --fg-height: 149px;
-  animation: moving-stars 30s infinite linear;
-}
-
 
 nav h3 {
   background: radial-gradient(farthest-side, #800060d0, #800060b0, transparent);
@@ -80,62 +64,4 @@ ul {
   background-color:#202;
   width: 100%;
   padding: 10px;
-}
-
-@keyframes moving-stars {
-  0% {background-position:    /*twinkle*/ 0px 0px,
-                              /*fg*/  calc(var(--fg-width)*3) 0px,
-                              /*bg*/  0px 0px;
-  }
-  49.99% {background-position:/*twinkle*/ 0px 0px,
-                              /*fg*/ 0px calc(var(--fg-height)*2),
-                              /*bg*/ calc(var(--bg-width)/2) calc(var(--bg-height)/2);
-  }
-  50% {background-position:    /*twinkle*/ 0px 0px,
-                              /*fg*/  calc(var(--fg-width)*3) var(--fg-height),
-                              /*bg*/  calc(var(--bg-width)/2) calc(var(--bg-height)/2);
-  }
-  100% {background-position:  /*twinkle*/ 0px 0px,
-                              /*fg*/ 0px calc(var(--fg-height)*2),
-                              /*bg*/ var(--bg-width) var(--bg-height);
-  }
-}
-
-/* / Getting slapped / */
-
-@keyframes slapped {
-  0% {transform: perspective(3cm) rotateY(0deg);}
-  30% {transform: perspective(4cm) rotateY(-50deg);}
-  100% {transform: perspective(3cm) rotateY(720deg);}
-}
-  
-.handSlap {
-  animation-name: slapped;
-  animation-duration: 1.5s;
-  animation-iteration-count: 1;
-  animation-timing-function: cubic-bezier(.17,.67,.62,1.1);
-}
-
-/* / Console typing / */
-
-.console-typed {
-  color: hsl(45, 100%, 50%);
-}
-.console-typed-highlight {
-  background-color: hsl(45, 100%, 50%);
-  color: black;
-}
-
-.console-blinky {
-  animation: blinker 1500ms steps(1, jump-end) infinite;
-}
-
-@keyframes blinker {
-  from, to {
-    color: hsl(45, 100%, 50%);
-  }
-  50% {
-    background-color: hsl(45, 100%, 50%);
-    color: rgba(0,0,0,1);
-  }
 }
