@@ -1,4 +1,5 @@
 plzignore 
+_img
 _site
 .sass-cache
 .jekyll-cache

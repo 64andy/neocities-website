@@ -6,22 +6,32 @@ permalink: /flag-pfp/
 
 <div class="flex">
   <div>
-    <canvas id="yes" width="400" height="400">
+    <!-- The rendered image -->
+    <canvas id="result" width="400" height="400">
       <marquee>Sorry, your browser doesn't support canvas, or I broke everything</marquee>
     </canvas>
+
+    <!-- The controls -->
     <div class="flag-input">
       <form onsubmit="return false">
         <label for="pfp">Add profile pic </label>
         <input type="file" id="pfp" name="pfp" accept="image/*" onchange="formEvents.applyPfp()" />
+
+        <br />
         <br />
 
         <label for="flag">Add LHS flag </label>
         <input type="file" id="left-flag" name="left flag" accept="image/*"
           onchange="formEvents.applyLeftFlag()" />
+
         <br />
+        <br />
+
         <label for="flag">Add RHS flag </label>
         <input type="file" id="right-flag" name="right flag" accept="image/*"
           onchange="formEvents.applyRightFlag()" />
+
+         <br />
         <br />
 
 
@@ -35,12 +45,18 @@ permalink: /flag-pfp/
       </form>
     </div>
   </div>
+
+  <!-- My excuse -->
   <p>
-    On today's episode of "You should've used WebGL
-    instead of individually manipulating pixels".
+    Round profile pictures are the bane of my existence.<br />
+    Also, putting a flag ring around a circular pfp looks wrong.<br />
+    This little thing lets you put a flag ring around an image, warping it to look
+    right.    
     <br /><br />
     TODO: Implement maybe some flag selection drop-down
   </p>
+
+
 </div>
 
 <link href="/css/flag.css" rel="stylesheet" type="text/css" media="all">

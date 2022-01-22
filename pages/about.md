@@ -6,7 +6,9 @@ permalink: /about/
 
 <h1 id="console-banner">carrd is easier to use</h1>
 
-Hello, my name's Frank... ok maybe i'm joking ;3
+Hello, my name's Kyle xD...
+
+ok maybe i'm joking ;3
 
 + Uni student
 + Small and pathetic
@@ -27,7 +29,7 @@ Hello, my name's Frank... ok maybe i'm joking ;3
 
 
 - **Current Obsession**: Collecting bargain CDs, and [WinAmp skins](https://twitter.com/winampskins)
-  - Doing so because owning something you can keep in this streaming age is cool and good
+  - Ownership in the renting age is pretty cool, *but fuck NFTs*
 
 
 

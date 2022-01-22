@@ -1,6 +1,6 @@
 var ready = false;
 
-const mainCanvas = document.getElementById("yes");
+const mainCanvas = document.getElementById("result");
 /** @type {CanvasRenderingContext2D} */
 const mainCtx = mainCanvas.getContext("2d");
 
