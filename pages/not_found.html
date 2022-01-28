@@ -62,6 +62,7 @@ permalink: /not-found.html
                 35
     );
     await sleep(200);
+    // Remove hidden flag
     jim.classList.remove('hidden');
     await sleep(1800);
     await write('line2',
@@ -80,4 +81,6 @@ permalink: /not-found.html
                 true,
                 true)
   }
+
+  window.onload = init;
 </script>

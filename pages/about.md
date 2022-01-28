@@ -43,4 +43,6 @@ ok maybe i'm joking ;3
       false, /*endWithCursor*/
     );
   }
+
+  window.onload = init;
 </script>
