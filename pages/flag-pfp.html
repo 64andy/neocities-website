@@ -15,9 +15,9 @@ permalink: /flag-pfp/
     <div class="flag-input">
       <form onsubmit="return false">
         <label for="pfp">Add profile pic </label>
-        <input type="file" id="pfp" name="pfp" accept="image/*" onchange="formEvents.applyPfp()" />
+        <input type="file" id="pfp" name="pfp" accept="image/*"
+          onchange="formEvents.applyPfp()" />
 
-        <br />
         <br />
 
         <label for="flag">Add LHS flag </label>
@@ -25,33 +25,40 @@ permalink: /flag-pfp/
           onchange="formEvents.applyLeftFlag()" />
 
         <br />
-        <br />
 
         <label for="flag">Add RHS flag </label>
         <input type="file" id="right-flag" name="right flag" accept="image/*"
           onchange="formEvents.applyRightFlag()" />
 
-         <br />
-        <br />
-
-
+        <br /><br />
+        
         <label for="radius">Flag radius </label>
-        <input type="range" min="0" max="100" value="10" id="radius" name="radius"
-          oninput="formEvents.changeRadius()" />
-        <label for="radius" id='radius-display'></label>
+        <input type="range" min=0 max=100 value=5 id="radius" name="radius"
+          onchange="formEvents.updateRadius()"
+          oninput="formEvents.updateRadiusDisplay()" />
+        <label for="radius" id='radius-display'>...</label>
+        
         <br />
+
+        <label for="strength">Warp strength </label>
+        <input type="range" min=0 max=100 value=70 id="strength" name="strength" 
+          onchange="formEvents.updateStrength()"
+          oninput="formEvents.updateStrengthDisplay()"/>
+        <label for="strength" id="strength-display">...</label>
+
+        <br />
+
         <label for="cropped">Crop the whole image? </label>
-        <input type="checkbox" name="cropped" id="cropped" checked onchange="formEvents.updateFlagCrop()" />
+        <input type="checkbox" name="cropped" id="cropped" checked
+          onchange="formEvents.updateFlagCrop()" />
       </form>
     </div>
   </div>
 
   <!-- My excuse -->
   <p>
-    Round profile pictures are the bane of my existence.<br />
-    Also, putting a flag ring around a circular pfp looks wrong.<br />
-    This little thing lets you put a flag ring around an image, warping it to look
-    right.    
+    Round profile pictures suck.<br />
+    Allows you to apply flag borders to images, with corrective warp
     <br /><br />
     TODO: Implement maybe some flag selection drop-down
   </p>
@@ -60,4 +67,4 @@ permalink: /flag-pfp/
 </div>
 
 <link href="/css/flag.css" rel="stylesheet" type="text/css" media="all">
-<script src="/js/flag.js"></script>
+<script src="/js/flag.js" type="module"></script>

@@ -1,237 +1,99 @@
+import { ImgDataHelper, ImageManipulations } from "./img-helpers.mjs";
+
 var ready = false;
 
 const mainCanvas = document.getElementById("result");
-/** @type {CanvasRenderingContext2D} */
-const mainCtx = mainCanvas.getContext("2d");
 
-
-const width = mainCanvas.getAttribute("width");
-const height = mainCanvas.getAttribute("height");
-var radius = 0;
-var isCropped = true;
+const imageSettings = {
+    radius: 0,
+    isCropped: true,
+    warpStrength: 1.0,
+}
 
 // Images
-/** @type {HTMLCanvasElement} */
-const leftFlag = document.createElement('canvas');
-leftFlag.width = width;
-leftFlag.height = height;
-/** @type {HTMLCanvasElement} */
-const rightFlag = document.createElement('canvas');
-rightFlag.width = width;
-rightFlag.height = height;
-
-/** @type {CanvasRenderingContext2D} */
-const leftFlagCtx = leftFlag.getContext('2d');
-leftFlagCtx.imageSmoothingEnabled = false;  // Prevents blur
-/** @type {CanvasRenderingContext2D} */
-const rightFlagCtx = rightFlag.getContext('2d');
-rightFlagCtx.imageSmoothingEnabled = false;  // GL_LINEAR
-
-
-/** @type {HTMLCanvasElement} */
-const pfp = document.createElement('canvas');
-pfp.width = width;
-pfp.height = height;
-
-/** @type {CanvasRenderingContext2D} */
-const pfpCtx = pfp.getContext('2d');
+const Images = {
+    /** @type {ImgDataHelper?} */
+    leftFlag: null,
+    /** @type {ImgDataHelper?} */
+    rightFlag: null,
+    /** @type {ImgDataHelper?} */
+    pfp: null,
+}
 
 // The elements i'd need to access
 var elems = {
     leftFlagUpload: document.getElementById('left-flag'),
     rightFlagUpload: document.getElementById('right-flag'),
     pfpUpload: document.getElementById('pfp'),
-    radiusChange: document.getElementById('radius'),
-    cropCheckbox: document.getElementById('cropped'),
+    radiusSlider: document.getElementById('radius'),
     radiusDisplay: document.getElementById('radius-display'),
+    strengthSlider: document.getElementById('strength'),
+    strengthDisplay: document.getElementById('strength-display'),
+    cropCheckbox: document.getElementById('cropped'),
 }
 
 // Method namespace: Contains events bound to the form
 var formEvents = {
     // Methods
     /**
-     * Reads the uploaded file (hopefully an image)
-     * and applies it to the profile pic canvas 
+     * Turns the file into an image, and saves it to
+     * the global `Images` object with a key of imgName.
      */
-    applyPfp() {
-        let file = elems.pfpUpload.files[0];
+    async _fileToImage(file, imgName, imageSmoothing = true, width = undefined, height = undefined) {
         if (file === undefined) {
-            console.warn("applyPfp: No pic uploaded yet")
+            console.warn(`${imgName}: No pic uploaded yet`);
             return;
         }
-        let targetCtx = pfpCtx;
-        readImage(file)
-        .then((pfpImg) => {
-            targetCtx.drawImage(pfpImg, 0, 0, width, height);
-            if (ready) renderPfp(mainCanvas);
-        })
-        .catch((err) => {
-            console.error("Error reading the profile pic:", err);
-        });
-    },
-
-    applyLeftFlag() {
-        formEvents.applyFlag(leftFlagCtx, elems.leftFlagUpload.files[0]);
-    },
-    applyRightFlag() {
-        formEvents.applyFlag(rightFlagCtx, elems.rightFlagUpload.files[0]);
-    },
-    /**
-     * Reads the file, parses it as an image, then does the flag stretch,
-     * and applies it to the flag canvas
-     */
-    applyFlag(ctx, file) {
-        if (file === undefined) {
-            console.warn("applyFlag: No pic uploaded yet");
-            return;
-        }
-
-        readImage(file)
-        .then((flagImg) => {
-            return stretchFlagForCircles(flagImg);
-        })
-        .catch((err) => {
-            console.error("Error reading the flag image:", err);
-        })
-        .then((newFlagImg) => {
-            ctx.drawImage(newFlagImg, 0, 0, width, height);
-            if (ready) renderPfp(mainCanvas);
-        });
-    },
-
-    changeRadius() {
-        let rad = elems.radiusChange.value;
-        updateRadius(rad);
+        Images[imgName] = await ImgDataHelper.fromFile(file, imageSmoothing, width, height);
         if (ready) renderPfp(mainCanvas);
     },
-    updateFlagCrop() {
-        isCropped = elems.cropCheckbox.checked;
+    async applyPfp() {
+        await formEvents._fileToImage(elems.pfpUpload.files[0], 'pfp', true, mainCanvas.width, mainCanvas.height);
+    },
+    async applyLeftFlag() {
+        await formEvents._fileToImage(elems.leftFlagUpload.files[0], 'leftFlag', false, mainCanvas.width, mainCanvas.width);
+    },
+    async applyRightFlag() {
+        await formEvents._fileToImage(elems.rightFlagUpload.files[0], 'rightFlag', false, mainCanvas.width, mainCanvas.height);
+
+    },
+
+    async updateRadiusDisplay() {
+        elems.radiusDisplay.innerText = `${elems.radiusSlider.value}%`;
+    },
+
+    async updateRadius() {
+        await formEvents.updateRadiusDisplay();
+        imageSettings.radius = elems.radiusSlider.value / 100;
         if (ready) renderPfp(mainCanvas);
     },
+    async updateFlagCrop() {
+        imageSettings.isCropped = elems.cropCheckbox.checked;
+        if (ready) renderPfp(mainCanvas);
+    },
+
+    async updateStrengthDisplay() {
+        elems.strengthDisplay.innerText = `${elems.strengthSlider.value}%`;
+    },
+
+    async updateStrength() {
+        await formEvents.updateStrengthDisplay();
+        imageSettings.warpStrength = elems.strengthSlider.value / 100;
+        if (ready) renderPfp(mainCanvas);
+    }
 }
 
-
-/**
- * Updates the radius variable & radius display
- * @param {number} rad 
- */
-function updateRadius(rad) {
-    radius = rad;
-    elems.radiusDisplay.innerText = rad;
-}
-
-/** https://stackoverflow.com/a/46568146
- * Reads a file (from a form etc.), and returns it as an &lt; img >
- * @param {File} file The image file
- * @returns {Promise<HTMLImageElement>} 
- */
-function readImage(file) {
-    return new Promise((resolve, reject) => {
-        var fr = new FileReader();  
-        fr.onload = () => {
-            let image = new Image();
-            image.src = fr.result;
-            image.onload = () => {
-                resolve(image);
-            };
-            image.onerror = (err) => {
-                console.error(err);
-                reject("Can't parse image");
-            };
-        };
-
-        fr.onerror = (err) => {
-            console.error(err);
-            reject("Can't read image");
-        }
-
-        fr.readAsDataURL(file);
-      });
-}
 
 /**
  * 
  * @param {CanvasRenderingContext2D} canvas 
  */
 function clearCanvas(canvas) {
-    /** @type {CanvasRenderingContext2D} */
-    let ctx = canvas.getContext('2d');
-    ctx.restore();
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
 
     // OK restore doesn't work so uhhh HACK TIME
     // Hey if anyone knows how to delete the clip then tell me
-    canvas.width--; canvas.width++;
-}
-
-/**
- * Returns an image's pixels as a byte array.
- * It's just the canvas.getImageData function but automated
- * @param {HTMLImageElement} img
- * @returns {ImageData} An object representing the JS
- */
-function getImagePixels(img, sx, sy, sw, sh) {
-    // This is a hack, javascript is a hack, i hate it here, help
-    let canvas = document.createElement('canvas');
-    let ctx = canvas.getContext('2d');
-    canvas.width = width;
-    canvas.height = height;
-    ctx.imageSmoothingEnabled = false; // GL_LINEAR
-    ctx.drawImage(img, 0, 0, width, height);
-
-    let data = ctx.getImageData(sx, sy, sw, sh);
-    return data;
-}
-
-/**
- * Stretches an image the closer it is to the edge, this makes it look nicer in a cropped circle
- * @param {HTMLImageElement} img 
- * @returns {HTMLCanvasElement}
- */
-async function stretchFlagForCircles(img) {
-    let w = width;
-    let h = height;
-    const getPos = (s, t) => {
-        // Convert back to integer coords
-        let i = Math.floor(s * (w-1));
-        let j = Math.floor(t * (h-1));
-        return (i*w + j) * 4;
-    }
-    const getPixel = (src, s, t) => {
-        let pos = getPos(s, t);
-        let px = src.slice(pos, pos+4);
-        return px;
-    }
-    const writePixel = (src, px, i, j) => {
-        let pos = getPos(s, t);
-        for (let i = 0; i < px.length; i++) {
-            src[pos+i] = px[i];
-        }
-    }
-    const calcOffset = (x) => { // See `./desmos_graph.png`
-        return 0.5+(Math.asin(2*x-1))/Math.PI;
-    }
-    let oldPixels = getImagePixels(img, 0, 0, w, h).data;
-    let newPixels = new Uint8ClampedArray(oldPixels.length);
-    let s, t;   // x,y texture coords between [0, 1]
-    let sx, tx; // Offset coords
-    for (let i = 0; i < w; i++) {
-        s = i/(w-1);    // See? I remember my graphics class
-        let sx = calcOffset(s); // Semi-circle shape
-        
-        for (let j = 0; j < h; j++) { 
-            t = j/(h-1);
-            tx = calcOffset(t);
-            let pixel = getPixel(oldPixels, sx, tx);
-            writePixel(newPixels, pixel, s, t);
-        }
-    }
-    let canvas = document.createElement('canvas');
-    canvas.width = w; canvas.height = h;
-    let ctx = canvas.getContext('2d');
-    let imgData = new ImageData(newPixels, w, h);
-    ctx.putImageData(imgData, 0, 0);
-    return canvas;
+    // canvas.width--; canvas.width++;
 }
 
 function renderPfp(canvas) {
@@ -242,43 +104,50 @@ function renderPfp(canvas) {
 
     clearCanvas(canvas);
 
-    /** @type {CanvasRenderingContext2D} */
     let ctx = canvas.getContext('2d');
     ctx.font = "italic small-caps 30px Comic Sans MS";
-    ctx.fillStyle = "white";
+    ctx.fillStyle = "pink";
     ctx.fillText("Sup\n>:)", 150, 200);
     ctx.fillText("Add something", 90, 250);
 
-    // Init: An overall circular clip, kinda represents what it looks like
-    if (isCropped) {
-        let flagCropPath = new Path2D();
-        flagCropPath.arc(width/2, height/2, height/2, 0, 2*Math.PI);
-        ctx.clip(flagCropPath);
+    let backgroundImg = null;
+    let foregroundImg = null;
+    // * Draw the underlying flag
+    if (Images.leftFlag && Images.rightFlag) {
+        // If both exist, show half the left and half the right
+        backgroundImg = ImageManipulations.splitImageOverlay(Images.leftFlag, Images.rightFlag, canvas.width, canvas.height);
+        backgroundImg = ImageManipulations.roundedWarp(backgroundImg, imageSettings.warpStrength);
+    } else if (Images.leftFlag || Images.rightFlag) {
+        // If one exists, stretch that one
+        let existingFlag = (Images.leftFlag || Images.rightFlag);
+        backgroundImg = ImageManipulations.roundedWarp(existingFlag, imageSettings.warpStrength);
     }
-    // Step 1: Draw the flag
-    ctx.drawImage(leftFlag, 0, 0, width, height);
-    ctx.drawImage(rightFlag,
-                    width/2, 0,     // sx, sy
-                    width, height,  // sw, sh
-                    width/2, 0,     // dx, dy
-                    width, height); // dw, dh
-    // Step 2a: Image clip
-    let pfpRadiusClip = new Path2D();
-    pfpRadiusClip.arc(width/2, height/2, (height/2)-radius, 0, 2*Math.PI);
-    ctx.clip(pfpRadiusClip);
-    // Step 2b: Draw the PFP
-    ctx.drawImage(pfp, radius, radius, width-radius*2, height-radius*2);
+    // * If applicible, apply a circular crop to the background
+    if (backgroundImg && imageSettings.isCropped) {
+        backgroundImg = ImageManipulations.roundedCrop(backgroundImg);
+    }
+    // * Now, crop the foreground
+    if (Images.pfp) {
+        foregroundImg = ImageManipulations.roundedCrop(Images.pfp, imageSettings.radius);
+    }
+    // * Finally, paint them on
+    if (backgroundImg) backgroundImg.drawOntoCanvas(canvas);
+    if (foregroundImg) foregroundImg.drawOntoCanvas(canvas);
 }
 
 
-function init() {
-    // Save the initial context state because clips can't be removed otherwise
-    mainCtx.save();
+async function init() {
     // Trigger the events on the forms because browsers can remember on refresh
     for (const name in formEvents) {
-        formEvents[name]?.call()
+        if (!name.startsWith('_')){
+            console.log(`Calling formEvents.${name}();`);
+            await formEvents[name]?.call();
+        }
     }
-
     ready = true;
     renderPfp(mainCanvas);
 }
+
+// Make things accessible to the HTML
+window.formEvents = formEvents;
+window.onload = init;
