@@ -14,7 +14,13 @@ permalink: /
 
 __UNDER CONSTRUCTION__: This entire site is a WIP I might not finish
 
-Hello, I'm Andy
+I tried to make a Web 1.0 style website, to prove that you don't need
+constantly changing web frameworks, with slow bloated JS to make
+things\...
+
+\... unfortunately I'm using Jekyll, and also [Javascript](/9ufhdipklifwduhgsdaklfjko)\...
+
+BUT HEY at least I've got no tracking cookies, and I have no newsletter
 
 <script>
   function init() {
