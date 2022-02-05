@@ -1,4 +1,4 @@
-import { ImgDataHelper, ImageManipulations } from "./img-helpers.mjs";
+import { ImgDataHelper, ImageManipulations } from "./modules/img-helpers.js";
 
 var ready = false;
 
