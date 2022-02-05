@@ -65,15 +65,15 @@ html {
 
 @keyframes slapped {
   0% {
-    transform: perspective(3cm) rotateY(0deg);
+    transform: perspective(30cm) rotateY(0deg);
   }
 
   30% {
-    transform: perspective(4cm) rotateY(-50deg);
+    transform: perspective(30cm) rotateY(-50deg);
   }
 
   100% {
-    transform: perspective(3cm) rotateY(720deg);
+    transform: perspective(30cm) rotateY(720deg);
   }
 }
 
@@ -81,7 +81,7 @@ html {
   animation-name: slapped;
   animation-duration: 1.5s;
   animation-iteration-count: 1;
-  animation-timing-function: cubic-bezier(.17, .67, .62, 1.1);
+  animation-timing-function: cubic-bezier(.27, .77, .62, 1.2);
 }
 
 /* / Console typing / */

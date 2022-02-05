@@ -7,7 +7,7 @@ permalink: /not-found.html
 
 @keyframes wiggle {
   from {transform: rotate(-15deg);}
-  to {transform: rotateY(-40deg) rotateZ(25deg);}
+  to {transform: rotateY(-50deg) rotateZ(25deg);}
 }
 @keyframes fade-in {
   from {opacity: 0%;}
@@ -15,7 +15,7 @@ permalink: /not-found.html
 }
 
   .jim {
-    margin-left: 284px;
+    margin-left: 184px;
     width: 100px;
     height: 100px;
     image-rendering: -moz-crisp-edges;
@@ -35,52 +35,121 @@ permalink: /not-found.html
     color: aqua;
   }
 </style>
+
+<span id='msg'> </span>
+
 <h1>
   <span id="line1">&nbsp;</span>
+  <br>
+  <span id="line1.1">&nbsp;</span>
 </h1>
-<img src="/img/jim.png" alt="Hello Jim :)" id="jim" class="jim hidden" />
+<img src="/img/jim.png" title="Hello Jim :)" alt=">:|" id="jim" class="jim hidden" />
 <h1>
   <i><b><span id="line2" class="jim-speak">&nbsp;</span></b></i>
 </h1>
 <h1>
   <span id="line3">&nbsp;</span>
+  <br>
+  <span id="line3.1">&nbsp;</span>
+  <br>
+  <span id="line3.2">&nbsp;</span>
 </h1>
-<a href="/"><i><p class="centre killjoy" id="line4">
-</p></i></a>
-<script src="/js/misc.js"></script>
+<a href="/">
+  <i>
+    <span class="centre killjoy" id="line4.1"></span>
+    <span class="centre killjoy" id="line4.2"></span>
+  </i>
+</a>
+<h1 id="line5"><br></h1>
 <script>
-  async function write(id, text, ms, center, trail) {
-    document.getElementById(id).innerText = text;
-    await typeOutText(id, ms, 5, center, trail);
+  async function write(id, text, ms, align, trail) {
+    document.querySelector(id).innerText = text;
+    await typeOutText(id, 
+    {
+      ms: ms,
+      slowCoeff: 7,
+      align: align,
+      endWithCursor: trail
+    });
   }
 
   async function init() {
-    let jim = document.getElementById('jim')
-    await write('line1',
-                `> Ok so this '${location.pathname}' thing was a scam, `
-                +`but on the plus side, I found this little guy`,
-                35
-    );
+    let jim = document.querySelector('#jim');
+    // Have to put this in as code b/c static webpage
+    let msg = document.querySelector('#msg');
+    msg.innerText = 
+      `siphon ${JSON.stringify(location.pathname)}: no such resource (404).`;
+    msg.innerHTML += '<br>';
+    msg.innerText += 'contact your local shift manager.'
+    await write('#line1',
+                `> bad news, that tip off was bogus -_-*`,
+                65);
+    await sleep(800);
+    await write('#line1\\.1',
+                `> BUT I FOUND THIS LITTLE GUY o_o`,
+                30);
     await sleep(200);
     // Remove hidden flag
     jim.classList.remove('hidden');
     await sleep(1800);
-    await write('line2',
+    await write('#line2',
                 "#__$BL4-A\\x01RG|H|-*|/\\..",
-                150
+                150,
+                'right'
     );
     await sleep(1500);
-    await write('line3',
-                "> It's our pet now :3 I'm keeping it",
+    await write('#line3',
+                "> found it chewing on the power cables,",
                 45
     );
     await sleep(500);
-    await write('line4',
-                `*We're not keeping her, get back to work*`,
-                80,
-                true,
-                true)
-  }
+    await write('#line3\\.1',
+                "> fed em rusted batteries n he purred",
+                55
+    );
+    await sleep(900);
+    await write('#line3\\.2',
+                "> yo i'm keeping this lil dude :3",
+                45
+    );
+    await sleep(800);
+    await write('#line4\\.1',
+                `*Worker, no feeding pests. `,
+                20);
+    await sleep(500);
+    await write('#line4\\.2',
+                `Leave her alone and retuuuuuuuuuuu`,
+                30);
+    let expungedElement = document.getElementById('line4.2');
+    for (let i = 0; i < 3; i++) {
+      expungedElement.innerText = '#'.repeat(expungedElement.innerText.length);
+      await sleep(90);
+      expungedElement.innerText = '*'.repeat(expungedElement.innerText.length);
+      await sleep(50);
+    }
+    await write('#line4\\.2',
+                `Leave it alone and return to your station.`,
+                20,
+                'center',
+                true);
+    await sleep(4500);
+    await write('#line5',
+                '> wait, "her"?',
+                90,
+                'left');
+    await sleep(2000);
+    expungedElement = document.querySelector('#line5');
+    for (let i = 0; i < 3; i++) {
+      expungedElement.innerText = '#'.repeat(expungedElement.innerText.length);
+      await sleep(100);
+      expungedElement.innerText = '*'.repeat(expungedElement.innerText.length);
+      await sleep(50);
+    }
+    await write('#line5',
+                '☺'.repeat(20),
+                30)
+    expungedElement.innerHTML = "";
+  };
 
   window.onload = init;
 </script>

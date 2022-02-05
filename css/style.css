@@ -1,11 +1,10 @@
-
 nav h3 {
   background: radial-gradient(farthest-side, #800060d0, #800060b0, transparent);
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
 }
 
 nav {
-  color: white;
+  color: #ddf;
   font-family: Consolas;
   font-size: small;
 }
@@ -13,6 +12,7 @@ nav {
 a {
   color: lightseagreen;
 }
+
 a:visited {
   color: hsl(219, 76%, 70%);
 }
@@ -32,8 +32,18 @@ ul {
   text-align: center;
 }
 
+footer {
+  margin-top: 10px;
+  text-align: center;
+  background-color: #020;
+  border-style: groove;
+  border-radius: 10px;
+  border-width: 2px;
+  border-color: hsl(16, 100%, 36%);
+}
+
 .center, .centre { /*lol*/
-  text-align:center;
+  text-align: center;
   margin: auto;
 }
 
@@ -60,7 +70,7 @@ ul {
   border-style: dotted;
   border-radius: 2px;
   box-sizing: border-box;
-  border-color:coral;
+  border-color:hsl(16, 80%, 52%);;
   background-color:#202;
   width: 100%;
   padding: 10px;
