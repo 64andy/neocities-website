@@ -71,6 +71,18 @@ async function typeOutText(
 
 /** @param {HTMLElement} self */
 function getSlapped(self) {
-    self.classList.toggle('handSlap');
-    setTimeout(() => self.classList.remove('handSlap'), 1500);
+    const ANIM_DURATION = 1500;
+    const currentTime = new Date().getTime();
+    const lastTime = getSlapped.lastTime || 0;
+    // If the animation's still playing
+    if (currentTime < ANIM_DURATION + lastTime) {
+        return;
+    }
+    // Readd the tag to initiate the animation
+    if (self.classList.contains('handSlap')) {
+        self.classList.remove('handSlap');
+        self.offsetWidth = self.offsetWidth;
+    }
+    self.classList.add('handSlap');
+    getSlapped.lastTime = currentTime;
 }
