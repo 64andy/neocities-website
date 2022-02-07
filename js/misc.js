@@ -71,7 +71,7 @@ async function typeOutText(
 
 /** @param {HTMLElement} self */
 function getSlapped(self) {
-    const ANIM_DURATION = 1500;
+    const ANIM_DURATION = 1800;
     const currentTime = new Date().getTime();
     const lastTime = getSlapped.lastTime || 0;
     // If the animation's still playing

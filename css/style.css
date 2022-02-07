@@ -95,7 +95,7 @@ footer {
 
 .handSlap {
   animation-name: slapped;
-  animation-duration: 1.5s;
+  animation-duration: 1800ms;
   animation-iteration-count: 1;
   animation-timing-function: cubic-bezier(.27, .77, .62, 1.2);
 }
