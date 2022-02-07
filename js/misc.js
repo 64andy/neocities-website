@@ -69,20 +69,24 @@ async function typeOutText(
         banner.innerHTML += `<span class="console-blinky">&nbsp;</span>`;
 }
 
-/** @param {HTMLElement} self */
-function getSlapped(self) {
+/**
+ * Applies the spin CSS animation to the given element
+ * @param {HTMLElement} elem 
+ * @requires style.css
+ */
+function spin(elem) {
     const ANIM_DURATION = 1800;
     const currentTime = new Date().getTime();
-    const lastTime = getSlapped.lastTime || 0;
+    const lastTime = spin.lastTime || 0;
     // If the animation's still playing
     if (currentTime < ANIM_DURATION + lastTime) {
         return;
     }
     // Readd the tag to initiate the animation
-    if (self.classList.contains('handSlap')) {
-        self.classList.remove('handSlap');
-        self.offsetWidth = self.offsetWidth;
+    if (elem.classList.contains('handSlap')) {
+        elem.classList.remove('handSlap');
+        elem.offsetWidth = elem.offsetWidth;
     }
-    self.classList.add('handSlap');
-    getSlapped.lastTime = currentTime;
+    elem.classList.add('handSlap');
+    spin.lastTime = currentTime;
 }
