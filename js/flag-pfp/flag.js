@@ -1,27 +1,16 @@
-import { ImgDataHelper, ImageManipulations } from "./modules/img-helpers.js";
+import { Renderer } from "./renderer.js";
+import { ImgDataHelper } from "../img-helpers.js";
+
+const R = new Renderer();
 
 var ready = false;
 
 const mainCanvas = document.getElementById("result");
 
-const imageSettings = {
-    radius: 0,
-    isCropped: true,
-    warpStrength: 1.0,
-}
 
-// Images
-const Images = {
-    /** @type {ImgDataHelper?} */
-    leftFlag: null,
-    /** @type {ImgDataHelper?} */
-    rightFlag: null,
-    /** @type {ImgDataHelper?} */
-    pfp: null,
-}
 
 // The elements i'd need to access
-var elems = {
+const elems = {
     leftFlagUpload: document.getElementById('left-flag'),
     rightFlagUpload: document.getElementById('right-flag'),
     pfpUpload: document.getElementById('pfp'),
@@ -33,7 +22,7 @@ var elems = {
 }
 
 // Method namespace: Contains events bound to the form
-var formEvents = {
+const formEvents = {
     // Methods
     /**
      * Turns the file into an image, and saves it to
@@ -44,7 +33,8 @@ var formEvents = {
             console.warn(`${imgName}: No pic uploaded yet`);
             return;
         }
-        Images[imgName] = await ImgDataHelper.fromFile(file, imageSmoothing, width, height);
+        const img = await ImgDataHelper.fromFile(file, imageSmoothing, width, height);
+        R.setImage(imgName, img);
         if (ready) renderPfp(mainCanvas);
     },
     async applyPfp() {
@@ -64,11 +54,12 @@ var formEvents = {
 
     async updateRadius() {
         await formEvents.updateRadiusDisplay();
-        imageSettings.radius = elems.radiusSlider.value / 100;
+        const radius = elems.radiusSlider.value / 100;
+        R.setImageSetting('radius', radius);
         if (ready) renderPfp(mainCanvas);
     },
     async updateFlagCrop() {
-        imageSettings.isCropped = elems.cropCheckbox.checked;
+        R.setImageSetting('isCropped', elems.cropCheckbox.checked);
         if (ready) renderPfp(mainCanvas);
     },
 
@@ -78,7 +69,8 @@ var formEvents = {
 
     async updateStrength() {
         await formEvents.updateStrengthDisplay();
-        imageSettings.warpStrength = elems.strengthSlider.value / 100;
+        const warpStrength = elems.strengthSlider.value / 100;
+        R.setImageSetting('warpStrength', warpStrength);
         if (ready) renderPfp(mainCanvas);
     }
 }
@@ -90,57 +82,48 @@ var formEvents = {
  */
 function clearCanvas(canvas) {
     canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-
-    // OK restore doesn't work so uhhh HACK TIME
-    // Hey if anyone knows how to delete the clip then tell me
-    // canvas.width--; canvas.width++;
 }
+
 
 function renderPfp(canvas) {
     if (!ready) {
         console.warn("Won't render, not properly initialized");
         return;
     }
+    // * Only one render can happen at a time
+    if (renderPfp.locked) {
+        console.warn("Already rendering...");
+        return;
+    }
+    renderPfp.locked = true;
 
     clearCanvas(canvas);
 
     let ctx = canvas.getContext('2d');
     ctx.font = "italic small-caps 30px Comic Sans MS";
     ctx.fillStyle = "pink";
-    ctx.fillText("Sup\n>:)", 150, 200);
+    ctx.fillText("Sup >:)", 150, 200);
+    ctx.fillStyle = "#903"
     ctx.fillText("Add something", 90, 250);
 
-    let backgroundImg = null;
-    let foregroundImg = null;
-    // * Draw the underlying flag
-    if (Images.leftFlag && Images.rightFlag) {
-        // If both exist, show half the left and half the right
-        backgroundImg = ImageManipulations.splitImageOverlay(Images.leftFlag, Images.rightFlag, canvas.width, canvas.height);
-        backgroundImg = ImageManipulations.roundedWarp(backgroundImg, imageSettings.warpStrength);
-    } else if (Images.leftFlag || Images.rightFlag) {
-        // If one exists, stretch that one
-        let existingFlag = (Images.leftFlag || Images.rightFlag);
-        backgroundImg = ImageManipulations.roundedWarp(existingFlag, imageSettings.warpStrength);
-    }
-    // * If applicible, apply a circular crop to the background
-    if (backgroundImg && imageSettings.isCropped) {
-        backgroundImg = ImageManipulations.roundedCrop(backgroundImg);
-    }
-    // * Now, crop the foreground
-    if (Images.pfp) {
-        foregroundImg = ImageManipulations.roundedCrop(Images.pfp, imageSettings.radius);
-    }
-    // * Finally, paint them on
+    // * Get the images from the renderer
+    let backgroundImg = R.renderBackground(canvas.width, canvas.height);
+    let foregroundImg = R.renderForeground(canvas.width, canvas.height);
+    
+    // * Paint them on
     if (backgroundImg) backgroundImg.drawOntoCanvas(canvas);
     if (foregroundImg) foregroundImg.drawOntoCanvas(canvas);
+
+    // * Release the lock
+    renderPfp.locked = false;
 }
+
 
 
 async function init() {
     // Trigger the events on the forms because browsers can remember on refresh
     for (const name in formEvents) {
-        if (!name.startsWith('_')){
-            console.log(`Calling formEvents.${name}();`);
+        if (!name.startsWith('_')) {
             await formEvents[name]?.call();
         }
     }

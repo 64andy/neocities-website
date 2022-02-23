@@ -47,20 +47,107 @@ function readImage(file) {
  */
 class ImgDataHelper {
     /** 
-     * @param {ImageData} imgData An ImageData object
-     * @param {boolean} imageSmoothing Decides if the image
-     * has smoothing when scaled.
-     * True (default): The image blurs when enlarged.
-     * False: The image pixelates when enlarged.
+     * !!! You probably shouldn't directly call this !!!
+     * 
+     * Use one of the other constructors, like fromCanvas/fromFile/withSize etc.
     */
     constructor(imgData, imageSmoothing = true) {
+        /** @type {ImageData} */
         this.imgData = imgData;
+        /** @type {boolean} */
         this.imageSmoothing = imageSmoothing;
     }
+
     get width() { return this.imgData.width }
     get height() { return this.imgData.height }
+
+    /**
+     * Creates a copy of this instance, with the same dimensions
+     * but no pixels set.
+     * 
+     * @returns {ImgDataHelper}
+    */
+    blankCopy() {
+        const data = new ImageData(this.width, this.height);
+        return new ImgDataHelper(data, this.imageSmoothing);
+    }
+
+    /**
+     * Creates a new instance of ImgDataHelper, with the given width
+     * and height, but no pixels set (image is transparent)
+     * @param {number} width 
+     * @param {number} height 
+     * @param {boolean} imageSmoothing (Default: true)
+     * Does the image blur when scaled
+     * @returns {ImgDataHelper}
+    */
+    static withSize(width, height, imageSmoothing = true) {
+        // I'm using a canvas because creating an ImageData
+        // give a black image (because data is all 0's)
+        const canvas = document.createElement('canvas'); canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').imageSmoothingEnabled = imageSmoothing;
+        return ImgDataHelper.fromCanvas(canvas);
+    }
+
+    /**
+     * Create a new ImgDataHelper from a canvas element.
+     * 
+     * @param {HTMLCanvasElement} canvas 
+     * @returns {ImgDataHelper}
+    */
+    static fromCanvas(canvas) {
+        const ctx = canvas.getContext('2d');
+        const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        return new ImgDataHelper(data, ctx.imageSmoothingEnabled);
+    }
+
+    /**
+     * Turn a File object of an image into an ImgDataHelper
+     * @param {File} file An image file
+     * @param {boolean} imageSmoothing Whether the image will blur instead of
+     * pixelating when scaled (Default: true)
+     * @param {number?} width The target width.
+     * @param {number?} height The target height.
+     * @returns {ImgDataHelper} 
+     * @throws {string | Event | ProgressEvent<FileReader>}
+     * String or Event if the image conversion failed, and ProgressEvent if the file read failed.
+    */
+    static async fromFile(file, imageSmoothing = true, width = undefined, height = undefined) {
+        const img = await readImage(file);
+        width = (width === undefined) ? img.width : width;
+        height = (height === undefined) ? img.height : height;
+        // Pasting the image onto a canvas is the only way to read its pixels.
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d');
+        canvas.width = width;
+        canvas.height = height;
+        ctx.imageSmoothingEnabled = imageSmoothing;
+        ctx.drawImage(img, 0, 0, width, height);
+        return new ImgDataHelper(ctx.getImageData(0, 0, width, height), imageSmoothing)
+    }
+
+    /**
+     * Creates a new canvas element from this image
+     * 
+     * @returns {HTMLCanvasElement} A canvas with this object's image painted on
+    */
+    toCanvas(width = null, height = null) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = (width !== null) ? width : this.width;
+        canvas.height = (height !== null) ? height : this.height;
+        ctx.imageSmoothingEnabled = this.imageSmoothing;
+        if (canvas.width == this.width && canvas.height == this.height) {
+            canvas.getContext('2d').putImageData(this.imgData, 0, 0);
+        } else {
+            this.drawOntoCanvas(canvas);
+        }
+        return canvas;
+    }
     /**
      * Convert float [0, 1] UV co-ords to int <x, y> co-ords
+     * 
      * @returns {[number, number]}
      */
     toXY(u, v) {
@@ -70,6 +157,7 @@ class ImgDataHelper {
     }
     /**
      * Convert int <x, y> co-ords to float [0, 1] UV co-ords
+     * 
      * @returns {[number, number]}
      */
     toUV(x, y) {
@@ -106,42 +194,19 @@ class ImgDataHelper {
             this.imgData.data[pos + i] = px[i];
         }
     }
-    /**
-     * Writes the RGBA values to a pixel at the given **UV position**
-     * @param {[number, number, number, number]} px An RGBA pixel
-     * @param {number} u 
-     * @param {number} v 
-     */
-    writePixelUV(px, u, v) {
-        const [x, y] = this.toXY(u, v);
-        this.writePixel(px, x, y);
-    }
-    _arrayPos(x, y) {
-        // Wrapping policy - Repeat
-        if (!Number.isInteger(x) || !Number.isInteger(y)) alert("FUCK YOU PROVIDE INTS")
-        x = rem(x, this.width);
-        y = rem(y, this.height);
-        return (y * this.width + x) * 4
-    }
 
     /**
-     * @param {CanvasRenderingContext2D} canvas 
+     * Creates a new instance of this image, with a new size
+     * @param {number} newWidth 
+     * @param {number} newHeight 
      * @returns {ImgDataHelper}
      */
-    static fromCanvas(canvas) {
-        const ctx = canvas.getContext('2d');
-        const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        return new ImgDataHelper(data, ctx.imageSmoothingEnabled);
-    }
-
-    toCanvas() {
+    resized(newWidth, newHeight) {
         const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = this.width;
-        canvas.height = this.height;
-        ctx.imageSmoothingEnabled = this.imageSmoothing;
-        ctx.putImageData(this.imgData, 0, 0);
-        return canvas;
+        canvas.width = newWidth;
+        canvas.height = newHeight;
+        this.drawOntoCanvas(canvas);
+        return ImgDataHelper.fromCanvas(canvas);
     }
 
     /**
@@ -155,60 +220,34 @@ class ImgDataHelper {
      * 
      * @param {HTMLCanvasElement} target The canvas which gets drawn onto
      * @param {...number} posArgs Position args fed into drawImage()
-     */
+    */
     drawOntoCanvas(target, ...posArgs) {
-        const canvas = this.toCanvas();
+        const thisAsCanvas = this.toCanvas();
         const ctx = target.getContext('2d');
         // Change the base canvas imageSmoothing. We'll revert later
         const oldSmoothing = ctx.imageSmoothingEnabled;
         ctx.imageSmoothingEnabled = this.imageSmoothing;
         if (posArgs.length === 0) {
             // Stretch over target
-            ctx.drawImage(canvas, 0, 0, target.width, target.height);
+            ctx.drawImage(thisAsCanvas, 0, 0, target.width, target.height);
         } else {
-            ctx.drawImage(canvas, ...posArgs);
+            ctx.drawImage(thisAsCanvas, ...posArgs);
         }
         ctx.imageSmoothingEnabled = oldSmoothing;
     }
-    /**
-     * Turn a File object of an image into an ImgDataHelper
-     * @param {File} file An image file
-     * @param {boolean} imageSmoothing Whether the image will blur instead of
-     * pixelating when scaled (default=true)
-     * @param {number?} width The target width.
-     * @param {number?} height The target height.
-     * @returns {ImgDataHelper} 
-     * @throws {string | Event | ProgressEvent<FileReader>}
-     * String or Event if the image conversion failed, and ProgressEvent if the file read failed.
-     */
-    static async fromFile(file, imageSmoothing = true, width = undefined, height = undefined) {
-        const img = await readImage(file);
-        width = (width === undefined) ? img.width : width;
-        height = (height === undefined) ? img.height : height;
-        // Pasting the image onto a canvas is the only way to read its pixels.
-        const canvas = document.createElement('canvas')
-        const ctx = canvas.getContext('2d');
-        canvas.width = width;
-        canvas.height = height;
-        ctx.imageSmoothingEnabled = imageSmoothing;
-        ctx.drawImage(img, 0, 0, width, height);
-        return new ImgDataHelper(ctx.getImageData(0, 0, width, height), imageSmoothing)
-    }
 
-    /**
-     * Creates a copy of this instance, with the same dimensions
-     * but no pixels set.
-     * 
-     * @returns {ImgDataHelper}
-     */
-    blankCopy() {
-        const data = new ImageData(this.width, this.height);
-        return new ImgDataHelper(data, this.imageSmoothing);
+    /** @private */
+    _arrayPos(x, y) {
+        // Wrapping policy - Repeat
+        if (!Number.isInteger(x) || !Number.isInteger(y)) alert("FUCK YOU PROVIDE INTS")
+        x = rem(x, this.width);
+        y = rem(y, this.height);
+        return (y * this.width + x) * 4
     }
 }
 
 /**
- * A namespace for 
+ * A namespace for functions that take images
  */
 const ImageManipulations = {
     /**
@@ -270,29 +309,24 @@ const ImageManipulations = {
      * @param {ImgDataHelper} rightImg Image put on the right
      * @param {number} width Output image's width
      * @param {number} height Output image's height
-     * @param {number} splitPoint The position [0, 1] where the split occurs (default: 0.5)
+     * @param {number} lineAngle The angle of the split [0, 360]. (Default: 0)
      * @returns {ImgDataHelper} The freshly output image
      */
-    splitImageOverlay(leftImg, rightImg, width, height, splitPoint = 0.5) {
+    splitImageOverlay(leftImg, rightImg, width, height, lineAngle=0) {
         const output = document.createElement('canvas');
+        const ctx = output.getContext('2d');
         output.width = width;
         output.height = height;
-        // If both the left and right flags exist, do a half-n-half
-        const leftImgSplitpoint = leftImg.width * splitPoint;
-        const rightImgSplitpoint = rightImg.width * (1 - splitPoint);
-        const destHalfway = width / 2;
-        leftImg.drawOntoCanvas(output,
-            0, 0,                               // sx, sy,
-            leftImgSplitpoint, leftImg.height,  // sw, sh,
-            0, 0,                               // dx, dy,
-            destHalfway, height                 // dw, dh,
-        );
-        rightImg.drawOntoCanvas(output,
-            rightImgSplitpoint, 0,
-            rightImgSplitpoint, rightImg.height,
-            destHalfway, 0,
-            destHalfway, height
-        );
+        lineAngle = lineAngle * Math.PI / 180;
+        // Apply the base image
+        leftImg.drawOntoCanvas(output);
+        // Use a clip for the 2nd image
+        ctx.translate(-width/2, height/2);
+        ctx.rotate(lineAngle);
+        ctx.translate(width/2,  -height/2);
+        ctx.rect(0, 0, width/2, height);
+        ctx.clip();
+        rightImg.drawOntoCanvas(output);
         // Turn it back into an ImgData
         return ImgDataHelper.fromCanvas(output);
     }
