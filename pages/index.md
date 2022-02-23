@@ -28,7 +28,7 @@ BUT HEY at least I've got no tracking cookies, and I have no newsletter
       {
         ms: 60,
         slowCoeff: 6,
-        align: 'center',
+        align: 'right',
         endWithCursor: true,
       })
   }

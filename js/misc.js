@@ -78,14 +78,14 @@ function spin(elem) {
     const ANIM_DURATION = 1800;
     const currentTime = new Date().getTime();
     const lastTime = spin.lastTime || 0;
-    // If the animation's still playing
+    // Don't play if the animation's already playing
     if (currentTime < ANIM_DURATION + lastTime) {
         return;
     }
     // Readd the tag to initiate the animation
     if (elem.classList.contains('handSlap')) {
         elem.classList.remove('handSlap');
-        elem.offsetWidth = elem.offsetWidth;
+        elem.offsetWidth = elem.offsetWidth;    // Reset the size
     }
     elem.classList.add('handSlap');
     spin.lastTime = currentTime;
