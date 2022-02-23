@@ -76,7 +76,7 @@ const formEvents = {
         if (ready) renderPfp(mainCanvas);
     },
     async updateAngleDisplay() {
-        elems.angleDisplay.innerText = elems.angleSlider.value;
+        elems.angleDisplay.innerHTML = `${elems.angleSlider.value}&deg;`;
     },
     async updateAngle() {
         await formEvents.updateAngleDisplay();

@@ -318,15 +318,20 @@ const ImageManipulations = {
         output.width = width;
         output.height = height;
         lineAngle = lineAngle * Math.PI / 180;
+        // Clip needs to be as long as possible, longest
+        // distance is corner-to-corner diagonally.
+        const length = Math.hypot(width, height);
+        const vertPos = (-height/2) - (length-height)/2;
+        const horPos = 0;
         // Apply the base image
-        rightImg.drawOntoCanvas(output);
+        leftImg.drawOntoCanvas(output);
         // Use a clip for the 2nd image
         ctx.translate(width/2, height/2);
         ctx.rotate(lineAngle);
-        ctx.rect(-width/2, -height/2, width/2, height); ctx.clip();
+        ctx.rect(horPos, vertPos, length/2, length); ctx.clip();
         ctx.rotate(-lineAngle);
         ctx.translate(-width/2, -height/2);
-        leftImg.drawOntoCanvas(output);
+        rightImg.drawOntoCanvas(output);
         // Turn it back into an ImgData
         return ImgDataHelper.fromCanvas(output);
     }
