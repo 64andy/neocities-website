@@ -6,6 +6,7 @@ class Renderer {
             radius: 0,
             isCropped: true,
             warpStrength: 1.0,
+            angle: 0,
         };
         // The base images
         this.images = {
@@ -34,7 +35,7 @@ class Renderer {
                     /** @type {ImgDataHelper?} */
                     image: null,
                     usedValues: [
-                        'leftFlag', 'rightFlag', 'warpStrength', 'isCropped'
+                        'leftFlag', 'rightFlag', 'warpStrength', 'isCropped', 'angle'
                     ]
                 },
             },
@@ -45,6 +46,7 @@ class Renderer {
                 radius: true,
                 isCropped: true,
                 warpStrength: true,
+                angle: true,
             }
         };
     }
@@ -140,6 +142,7 @@ class Renderer {
         // Ok, cached image is out of date. Let's render it from scratch
         const leftImg = this.getImage('leftFlag');
         const rightImg = this.getImage('rightFlag');
+        const angle = this.getImageSetting('angle');
         const isCropped = this.getImageSetting('isCropped');
         const warpStrength = this.getImageSetting('warpStrength');
 
@@ -149,8 +152,9 @@ class Renderer {
         }
         if (leftImg && rightImg) {
             // If both have been uploaded, do a side-by-side split.
-            backgroundImage = ImageManipulations.splitImageOverlay(leftImg, rightImg, width, height);
-            backgroundImage = ImageManipulations.roundedWarp(backgroundImage, warpStrength);
+            backgroundImage = ImageManipulations.splitImageOverlay(leftImg, rightImg, width, height, angle);
+            if (radius != 0)
+                backgroundImage = ImageManipulations.roundedWarp(backgroundImage, warpStrength);
         } else if (leftImg || rightImg) {
             // If only one image is set, simply warp
             backgroundImage = (leftImg || rightImg).resized(width, height);

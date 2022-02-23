@@ -47,6 +47,14 @@ permalink: /flag-pfp/
 
         <br />
 
+        <label for="angle"> Split Angle </label>
+        <input type="range" min=0 max=360 value=0 step=5 id="angle" name="angle"
+          oninput="formEvents.updateAngleDisplay()"
+          onchange="formEvents.updateAngle()" />
+        <label for="angle" id="angle-display">...</label>
+
+        <br />
+
         <label for="cropped">Crop the whole image? </label>
         <input type="checkbox" name="cropped" id="cropped" checked
           onchange="formEvents.updateFlagCrop()" />

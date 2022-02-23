@@ -19,6 +19,8 @@ const elems = {
     strengthSlider: document.getElementById('strength'),
     strengthDisplay: document.getElementById('strength-display'),
     cropCheckbox: document.getElementById('cropped'),
+    angleSlider: document.getElementById('angle'),
+    angleDisplay: document.getElementById('angle-display'),
 }
 
 // Method namespace: Contains events bound to the form
@@ -72,6 +74,15 @@ const formEvents = {
         const warpStrength = elems.strengthSlider.value / 100;
         R.setImageSetting('warpStrength', warpStrength);
         if (ready) renderPfp(mainCanvas);
+    },
+    async updateAngleDisplay() {
+        elems.angleDisplay.innerText = elems.angleSlider.value;
+    },
+    async updateAngle() {
+        await formEvents.updateAngleDisplay();
+        const angle = elems.angleSlider.value;
+        R.setImageSetting('angle', angle);
+        if (ready) renderPfp(mainCanvas);
     }
 }
 
@@ -120,11 +131,11 @@ function renderPfp(canvas) {
 
 
 
-async function init() {
+function init() {
     // Trigger the events on the forms because browsers can remember on refresh
     for (const name in formEvents) {
         if (!name.startsWith('_')) {
-            await formEvents[name]?.call();
+            formEvents[name]?.call().catch(err => console.error(err));
         }
     }
     ready = true;

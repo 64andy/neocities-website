@@ -319,14 +319,14 @@ const ImageManipulations = {
         output.height = height;
         lineAngle = lineAngle * Math.PI / 180;
         // Apply the base image
-        leftImg.drawOntoCanvas(output);
-        // Use a clip for the 2nd image
-        ctx.translate(-width/2, height/2);
-        ctx.rotate(lineAngle);
-        ctx.translate(width/2,  -height/2);
-        ctx.rect(0, 0, width/2, height);
-        ctx.clip();
         rightImg.drawOntoCanvas(output);
+        // Use a clip for the 2nd image
+        ctx.translate(width/2, height/2);
+        ctx.rotate(lineAngle);
+        ctx.rect(-width/2, -height/2, width/2, height); ctx.clip();
+        ctx.rotate(-lineAngle);
+        ctx.translate(-width/2, -height/2);
+        leftImg.drawOntoCanvas(output);
         // Turn it back into an ImgData
         return ImgDataHelper.fromCanvas(output);
     }
