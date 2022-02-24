@@ -132,7 +132,17 @@ class Renderer {
         this.images[imageName] = newImage;
         this.cache.dirty[imageName] = true;
     }
-
+    /**
+     * Creates the background image, using the variables provided to this class.
+     * 
+     * Images needed: `leftFlag | rightFlag` (one or both)
+     * 
+     * Settings used: `angle (if both images are used), isCropped, warpStrength`
+     * @param {number} width The width of the output
+     * @param {number} height The height of the output
+     * @returns {ImgDataHelper?} If this Renderer has enough data to make
+     * a background, renders it. Otherwise, null.
+     */
     renderBackground(width, height) {
         let backgroundImage;
         // Get the cached image, if it's up date date then use it
@@ -140,21 +150,23 @@ class Renderer {
         if (backgroundImage)
             return backgroundImage;
         // Ok, cached image is out of date. Let's render it from scratch
-        const leftImg = this.getImage('leftFlag');
-        const rightImg = this.getImage('rightFlag');
+        let leftImg = this.getImage('leftFlag');
+        let rightImg = this.getImage('rightFlag');
         const angle = this.getImageSetting('angle');
         const isCropped = this.getImageSetting('isCropped');
         const warpStrength = this.getImageSetting('warpStrength');
 
         if (!leftImg && !rightImg) {
-            // If no images have been uploaded, return a blank image
-            return ImgDataHelper.withSize(width, height);
+            // If no images have been uploaded, return null.
+            return null;
         }
         if (leftImg && rightImg) {
             // If both have been uploaded, do a side-by-side split.
+            if (radius != 0) {
+                leftImg = ImageManipulations.roundedWarp(leftImg, warpStrength);
+                rightImg = ImageManipulations.roundedWarp(rightImg, warpStrength);
+            }
             backgroundImage = ImageManipulations.splitImageOverlay(leftImg, rightImg, width, height, angle);
-            if (radius != 0)
-                backgroundImage = ImageManipulations.roundedWarp(backgroundImage, warpStrength);
         } else if (leftImg || rightImg) {
             // If only one image is set, simply warp
             backgroundImage = (leftImg || rightImg).resized(width, height);
@@ -169,6 +181,17 @@ class Renderer {
         return backgroundImage;
     }
 
+    /**
+     * Creates the foreground images, using the variables provided to this class.
+     * 
+     * Images needed: `pfp`
+     * 
+     * Settings used: `radius`
+     * @param {number} width The width of the output
+     * @param {number} height The height of the output
+     * @returns {ImgDataHelper?} If you've provided all the images needed, it'll
+     * return it. Otherwise, null.
+     */
     renderForeground(width, height) {
         let croppedImage;
         // Check if we can get a cached version
@@ -178,7 +201,7 @@ class Renderer {
         }
         let pfp_img = this.getImage('pfp');
         const radius = this.getImageSetting('radius');
-        // If an image hasn't been uploaded yet, return a blank image
+        // If an image hasn't been uploaded yet, return null
         if (!pfp_img) {
             return ImgDataHelper.withSize(width, height);
         }
@@ -195,4 +218,4 @@ class Renderer {
     }
 }
 
-export {Renderer};
+export { Renderer };
