@@ -1,11 +1,10 @@
-
 nav h3 {
   background: radial-gradient(farthest-side, #800060d0, #800060b0, transparent);
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
 }
 
 nav {
-  color: white;
+  color: #ddf;
   font-family: Consolas;
   font-size: small;
 }
@@ -13,6 +12,7 @@ nav {
 a {
   color: lightseagreen;
 }
+
 a:visited {
   color: hsl(219, 76%, 70%);
 }
@@ -32,8 +32,18 @@ ul {
   text-align: center;
 }
 
+footer {
+  margin-top: 10px;
+  text-align: center;
+  background-color: #020;
+  border-style: double;
+  border-radius: 6px;
+  border-width: 4px;
+  border-color: hsl(16, 100%, 36%);
+}
+
 .center, .centre { /*lol*/
-  text-align:center;
+  text-align: center;
   margin: auto;
 }
 
@@ -60,8 +70,58 @@ ul {
   border-style: dotted;
   border-radius: 2px;
   box-sizing: border-box;
-  border-color:coral;
+  border-color:hsl(16, 80%, 52%);;
   background-color:#202;
   width: 100%;
   padding: 10px;
+}
+
+
+/* / Getting slapped / */
+
+@keyframes slapped {
+  0% {
+    transform: perspective(30cm) rotateY(0deg);
+  }
+
+  30% {
+    transform: perspective(30cm) rotateY(-50deg);
+  }
+
+  100% {
+    transform: perspective(30cm) rotateY(720deg);
+  }
+}
+
+.handSlap {
+  animation-name: slapped;
+  animation-duration: 1800ms;
+  animation-iteration-count: 1;
+  animation-timing-function: cubic-bezier(.27, .77, .62, 1.2);
+}
+
+/* / Console typing / */
+
+.console-typed {
+  color: hsl(45, 100%, 50%);
+}
+
+.console-typed-highlight {
+  background-color: hsl(45, 100%, 50%);
+  color: black;
+}
+
+.console-blinky {
+  animation: blinker 1500ms steps(1, jump-end) infinite;
+}
+
+@keyframes blinker {
+  from, to {
+    color: hsl(45, 100%, 50%);
+  }
+
+  50% {
+    background-color: hsl(45, 100%, 50%);
+    color: rgba(0, 0, 0, 1);
+  }
 }

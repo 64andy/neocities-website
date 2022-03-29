@@ -4,14 +4,16 @@ title: Ode to Ego
 permalink: /about/
 ---
 
-<h1 id="console-banner">carrd is easier to use</h1>
+<h1 id="console-banner">carrd, but worse</h1>
 
-Hello, my name's Frank... ok maybe i'm joking ;3
+Hello, my name's Kyle xD...
+
+ok maybe i'm joking ;3
 
 + Uni student
-+ Small and pathetic
-+ I like *Python*, still learning HTML/CSS/JS
-  + Hey what do you think's cuter?
++ 5'5" manlet? More like 5/5 man1337 ~~oh god i'm lonely~~
++ I like *Python*, still learning HTML/CSS/JS, bit of C/C++
+  + Hey what do you think's cuter? 
     [Fennecs](https://twitter.com/FennecsDaily)
     or
     [Ferrets](https://twitter.com/kaho_ferrets)?
@@ -27,18 +29,18 @@ Hello, my name's Frank... ok maybe i'm joking ;3
 
 
 - **Current Obsession**: Collecting bargain CDs, and [WinAmp skins](https://twitter.com/winampskins)
-  - Doing so because owning something you can keep in this streaming age is cool and good
+  - Ownership in the renting age is pretty cool, *but fuck NFTs*
 
 
 
-<script src="/js/misc.js"></script>
 <script>
   function init() {
-    typeOutText('console-banner', /*elem_id:*/
-      20,  /*ms:*/
-      6,  /*slowCoeff:*/
-      false,  /*isCentered:*/
-      false, /*endWithCursor*/
-    );
+    typeOutText('#console-banner',
+    {
+      ms: 20,
+      slowCoeff: 6,
+    });
   }
+
+  window.onload = init;
 </script>

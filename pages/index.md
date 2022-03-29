@@ -1,7 +1,4 @@
 ---
-# Feel free to add content and custom Front Matter to this file.
-# To modify the layout, see
-# https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 layout: default
 title: Andy's Existence
 permalink: /
@@ -14,23 +11,27 @@ permalink: /
   </h1>
   <br/>
 </div>
-<p class="center">
-  **Warning**: This entire site is a WIP I might not finish, who knows
-</p>
-<p>Slap test:</p>
-<img src="/img/neocities.png" onclick="getSlapped(this)">
 
+__UNDER CONSTRUCTION__: This entire site is a WIP I might not finish
 
+I tried to make a Web 1.0 style website, to prove that you don't need
+constantly changing web frameworks, with slow bloated JS to make
+things\...
 
+\... unfortunately I'm using Jekyll, and also [Javascript](/9ufhdipklifwduhgsdaklfjko)\...
 
-<script src="/js/misc.js"></script>
+BUT HEY at least I've got no tracking cookies, and I have no newsletter
+
 <script>
   function init() {
-    typeOutText('console-banner', /*elem_id:*/
-      40,  /*ms:*/
-      6,  /*slowCoeff:*/
-      true,  /*isCentered:*/
-      true, /*endWithCursor*/
-    );
+    typeOutText('#console-banner',
+      {
+        ms: 60,
+        slowCoeff: 6,
+        align: 'right',
+        endWithCursor: true,
+      })
   }
+
+  window.onload = init
 </script>

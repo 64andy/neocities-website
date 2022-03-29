@@ -15,17 +15,21 @@
   <title>{{page.title}}</title>
 </head>
 
-<body onload="init()">
+<body>
   <div class="main">
     <nav class="sidebar">
       {% include sidebar.html %}
     </nav>
-    <div id="content">
-      {{- content -}}
+    <div>
+      <div id="content">
+        {{- content -}}
+      </div>
+      <footer onclick="spin(this)">
+        Last modified: {{ page.path | file_date | date: "%F @ %R" }} NZ time
+      </footer>
     </div>
   </div>
-  <!-- <img src="/img/neocities.png" class="center"> -->
+  <script src="/js/misc.js"></script>
 </body>
-
 
 </html>

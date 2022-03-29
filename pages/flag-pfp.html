@@ -6,42 +6,72 @@ permalink: /flag-pfp/
 
 <div class="flex">
   <div>
-    <canvas id="yes" width="400" height="400">
+    <!-- The rendered image -->
+    <canvas id="result" width="400" height="400">
       <marquee>Sorry, your browser doesn't support canvas, or I broke everything</marquee>
     </canvas>
+
+    <!-- The controls -->
     <div class="flag-input">
       <form onsubmit="return false">
         <label for="pfp">Add profile pic </label>
-        <input type="file" id="pfp" name="pfp" accept="image/*" onchange="formEvents.applyPfp()" />
+        <input type="file" id="pfp" name="pfp" accept="image/*"
+          onchange="formEvents.applyPfp()" />
+
         <br />
 
         <label for="flag">Add LHS flag </label>
         <input type="file" id="left-flag" name="left flag" accept="image/*"
           onchange="formEvents.applyLeftFlag()" />
+
         <br />
+
         <label for="flag">Add RHS flag </label>
         <input type="file" id="right-flag" name="right flag" accept="image/*"
           onchange="formEvents.applyRightFlag()" />
-        <br />
 
-
+        <br /><br />
+        
         <label for="radius">Flag radius </label>
-        <input type="range" min="0" max="100" value="10" id="radius" name="radius"
-          oninput="formEvents.changeRadius()" />
-        <label for="radius" id='radius-display'></label>
+        <input type="range" min=0 max=100 value=5 id="radius" name="radius"
+          oninput="formEvents.updateRadius()" />
+        <label for="radius" id='radius-display'>...</label>
+        
         <br />
+
+        <label for="strength">Warp strength </label>
+        <input type="range" min=0 max=100 value=70 id="strength" name="strength" 
+          onchange="formEvents.updateStrength()"
+          oninput="formEvents.updateStrengthDisplay()"/>
+        <label for="strength" id="strength-display">...</label>
+
+        <br />
+
+        <label for="angle"> Split Angle </label>
+        <input type="range" min=0 max=360 value=0 step=5 id="angle" name="angle"
+          oninput="formEvents.updateAngleDisplay()"
+          onchange="formEvents.updateAngle()" />
+        <label for="angle" id="angle-display">...</label>
+
+        <br />
+
         <label for="cropped">Crop the whole image? </label>
-        <input type="checkbox" name="cropped" id="cropped" checked onchange="formEvents.updateFlagCrop()" />
+        <input type="checkbox" name="cropped" id="cropped" checked
+          onchange="formEvents.updateFlagCrop()" />
       </form>
     </div>
   </div>
+
+  <!-- My excuse -->
   <p>
-    On today's episode of "You should've used WebGL
-    instead of individually manipulating pixels".
+    Round profile pictures suck.<br />
+    Allows you to apply flag borders to images, with corrective warp
     <br /><br />
     TODO: Implement maybe some flag selection drop-down
   </p>
+
+
 </div>
 
 <link href="/css/flag.css" rel="stylesheet" type="text/css" media="all">
-<script src="/js/flag.js"></script>
+<script src="/js/flag-pfp/flag.js" type="module"></script>
