@@ -1,6 +1,6 @@
 nav h3 {
   background: radial-gradient(farthest-side, #800060d0, #800060b0, transparent);
-  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+  font-family: cursive;
 }
 
 nav {
@@ -52,7 +52,7 @@ footer {
   display: flex;
   width: 900px;
   color: hsl(45, 60%, 60%);
-  font-family: Consolas, 'Courier New', Courier, monospace;
+  font-family: Consolas, monospace;
   font-size: 90%;
   /* background-blend-mode: color-burn;
   background-image: radial-gradient(ellipse at center, #fff, #000); */

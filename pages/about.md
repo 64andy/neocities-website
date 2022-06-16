@@ -4,11 +4,7 @@ title: Ode to Ego
 permalink: /about/
 ---
 
-<h1 id="console-banner">carrd, but worse</h1>
-
-Hello, my name's Kyle xD...
-
-ok maybe i'm joking ;3
+<h1 id="console-banner">Face for radio, voice for newsprint.</h1>
 
 + Uni student
 + 5'5" manlet? More like 5/5 man1337 ~~oh god i'm lonely~~
@@ -37,8 +33,8 @@ ok maybe i'm joking ;3
   function init() {
     typeOutText('#console-banner',
     {
-      ms: 20,
-      slowCoeff: 6,
+      ms: 15,
+      slowCoeff: 30,
     });
   }
 
