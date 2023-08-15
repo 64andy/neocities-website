@@ -1,10 +1,18 @@
+# IDE
 .vscode
 
-plzignore 
-_img
+# All compiled pages
 _site
+
+# Temp folder when live-reloading
+_img
+
+# Framework stuff
 .sass-cache
 .jekyll-cache
 .jekyll-metadata
 vendor
 Gemfile.lock
+
+# Personal stuff
+plzignore 
