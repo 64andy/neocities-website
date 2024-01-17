@@ -12,11 +12,12 @@ permalink: /
   <br/>
 </div>
 
-__UNDER CONSTRUCTION__: This entire site is a WIP I might not finish
+# __UNDER CONSTRUCTION__
+## This entire site is a WIP I might not finish
 
 I tried to make a Web 1.0 style website, to prove that you don't need
 constantly changing web frameworks, with slow bloated JS to make
-things\...
+things\... 
 
 \... unfortunately I'm using Jekyll, and also [Javascript](/9ufhdipklifwduhgsdaklfjko)\...
 
