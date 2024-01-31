@@ -1,0 +1,44 @@
+.word-input-row {
+    row-gap: 5px;
+    column-gap: 5px;
+}
+
+.word-char {
+    font-size: x-large;
+    border: 1px solid lightskyblue;
+    text-align: center;
+    box-sizing: border-box;
+    margin: 5px;
+    width: 40px;
+    height: 40px;
+    padding: 0px;
+    line-height: 35px;
+    text-align: center;
+}
+
+.keyboard {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.keyboard-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-content: space-around;
+}
+
+.keyboard-char {
+    font-size: x-large;
+    border: 1px solid white;
+    margin: 5px;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+}
+
+.special-char {
+    font-size: small !important;
+}
