@@ -24,9 +24,9 @@ permalink: /wordle-solver/
     <div class="keyboard-row">
     {% assign row = "qwertyuiop" | split: '' %}
     {% for char in row %}
-        <div class="keyboard-char" data-key="{{char}}">
+        <button class="keyboard-char" data-key="{{char}}">
             {{char | upcase}}
-        </div>
+        </button>
     {% endfor %}
     </div>
 
@@ -34,27 +34,51 @@ permalink: /wordle-solver/
     <div class="keyboard-row">
     {% assign row = "asdfghjkl" | split: '' %}
     {% for char in row %}
-        <div class="keyboard-char" data-key="{{char}}">
+        <button class="keyboard-char" data-key="{{char}}">
             {{char | upcase}}
-        </div>
+        </button>
     {% endfor %}
     </div>
 
     <!-- Row #3: Enter + ZXCVBNM + Backspace -->
     <div class="keyboard-row">
-        <div class="keyboard-char special-char" data-key="Enter">
+        <button class="keyboard-char special-char" data-key="Enter">
             Enter
-        </div>
+        </button>
     {% assign row = "zxcvbnm" | split: '' %}
     {% for char in row %}
-        <div class="keyboard-char" data-key="{{char}}">
+        <button class="keyboard-char" data-key="{{char}}">
             {{char | upcase}}
-        </div>
+        </button>
     {% endfor %}
-        <div class="keyboard-char special-char" data-key="Backspace">
+        <button class="keyboard-char special-char" data-key="Backspace">
             Bksp
-        </div>
+        </button>
     </div>
 </div>
 <link href="/css/wordle.css" rel="stylesheet" type="text/css" media="all">
 <script src="/js/wordle/wordle-solver.js" type="text/javascript"></script>
+<script>
+    const rowTemplate = document
+                        .querySelector(".template-holder")
+                        .querySelector(".word-input-row");
+    const displayBoard = document.querySelector("#display-board");
+    
+    const renderer = new CurrentGuessDisplayer(rowTemplate, displayBoard);
+    const colourKeyboard = new ColourKeyboard();
+    const charKeyboard = new CharacterKeyboard();
+    const typingController = new TypingController(charKeyboard, colourKeyboard, renderer);
+
+    // Enter characters when the user types
+    document.onkeydown = (ev) => {
+        typingController.handleKey(ev.key);
+    }
+
+    // Make the onscreen keys do something
+    document.querySelectorAll(".keyboard-char").forEach((elem) => {
+        elem.onclick = () => typingController.handleKey(elem.dataset.key);
+    })
+
+    // Finally, render the first line
+    renderer.addNewRow();
+</script>
