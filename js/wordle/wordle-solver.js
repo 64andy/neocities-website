@@ -72,6 +72,10 @@ class ColourKeyboard {
             this.wordColours.pop();
         }
     }
+
+    reset() {
+        this.wordColours = [];
+    }
 }
 
 class CharacterKeyboard {
@@ -105,6 +109,10 @@ class CharacterKeyboard {
         if (this.currentWord.length > 0) {
             this.currentWord.pop();
         }
+    }
+
+    reset() {
+        this.currentWord = [];
     }
 }
 
@@ -156,14 +164,27 @@ class TypingController {
     enter() {
         switch (this.state) {
             case KeyboardState.Chars:
-                document.querySelector("#char-keyboard").classList.add("hidden");
-                document.querySelector("#colour-keyboard").classList.remove("hidden");
-                this.state = KeyboardState.Colours;
+                if (this.charKeyboard.currentWord.length == NUM_COLUMNS) {
+                    document.querySelector("#char-keyboard").classList.add("hidden");
+                    document.querySelector("#input-word").classList.add("hidden");
+                    document.querySelector("#colour-keyboard").classList.remove("hidden");
+                    document.querySelector("#input-colours").classList.remove("hidden");
+                    this.state = KeyboardState.Colours;
+                }
                 break;
             case KeyboardState.Colours:
-                document.querySelector("#char-keyboard").classList.remove("hidden");
-                document.querySelector("#colour-keyboard").classList.add("hidden");
-                this.state = KeyboardState.Chars;
+                if (this.colourKeyboard.wordColours.length == NUM_COLUMNS) {
+                    document.querySelector("#colour-keyboard").classList.add("hidden");
+                    document.querySelector("#input-colours").classList.add("hidden");
+                    document.querySelector("#char-keyboard").classList.remove("hidden");
+                    document.querySelector("#input-word").classList.remove("hidden");
+                    this.state = KeyboardState.Chars;
+
+                    // TODO: Make this process the answer
+                    this.charKeyboard.reset();
+                    this.colourKeyboard.reset();
+                    this.renderer.addNewRow();
+                }
                 break;
             default:
                 console.error(this.state);

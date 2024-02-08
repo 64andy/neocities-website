@@ -18,9 +18,8 @@ permalink: /wordle-solver/
 </table>
 
 <div id="message-box">
-    <span class="msg">Input your guess</span>
-    <br>
-    <span class="msg">Input the word's colours</span>
+    <span class="msg" id="input-word">Input your word</span>
+    <span class="msg hidden" id="input-colours">Input your word's colours</span>
 </div>
 
 <div class="keyboard" id="char-keyboard">
@@ -65,14 +64,14 @@ permalink: /wordle-solver/
 
 <div class="keyboard hidden" id="colour-keyboard">
     <div class="keyboard-row">
-        <button class="keyboard-key colour-key char-correct" data-key="g">Correct</button>
+        <button class="keyboard-key colour-key char-correct" data-key="g">Correct (G)</button>
     </div>
     <div class="keyboard-row">
-        <button class="keyboard-key colour-key char-wrong-spot" data-key="y">Wrong Spot</button>
+        <button class="keyboard-key colour-key char-wrong-spot" data-key="y">Wrong Spot (Y)</button>
     </div>
     <div class="keyboard-row">
         <button class="keyboard-key char-key special-char" data-key="Enter">Enter</button>
-        <button class="keyboard-key colour-key char-wrong-char" data-key="r">Wrong Character</button>
+        <button class="keyboard-key colour-key char-wrong-char" data-key="r">Wrong Character (R/B)</button>
         <button class="keyboard-key char-key special-char" data-key="Backspace">Bksp</button>
     </div>
 </div>
