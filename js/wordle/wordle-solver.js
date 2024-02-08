@@ -5,28 +5,35 @@ const BACKSPACE = "Backspace";
 /**
  * States if we're entering the word, or its colours 
  * @readonly
- * @enum {Symbol}
+ * @enum {String}
  */
 const KeyboardState = {
-    Chars: Symbol("Chars"),
-    Colours: Symbol("Colours"),
+    Chars: "Chars",
+    Colours: "Colours",
 }
 
 /**
  * Represents how correct each character is (i.e. their colour)
  * @readonly
- * @enum {Symbol}
+ * @enum {String}
  */
 const CharPosition = {
-    Correct: Symbol('char-correct'),
-    WrongSpot: Symbol('char-wrong-spot'),
-    Nothing: Symbol('char-nothing'),
+    Correct: 'char-correct',
+    WrongSpot: 'char-wrong-spot',
+    WrongChar: 'char-wrong-char',
+    Nothing: 'char-nothing',
 }
 
 const CharToColour = {
-    'g': CharPosition.Correct,
-    'y': CharPosition.WrongSpot,
-    'b': CharPosition.Nothing,
+    // Correct character correct spot
+    'g': CharPosition.Correct,      // (g)reen
+    // Correct character wrong spot
+    'y': CharPosition.WrongSpot,    // (y)ellow
+    // Wrong character wrong spot
+    // (Multiple binding  just for me)
+    'b': CharPosition.WrongChar,    // (b)lack [in wordle it's black]
+    'r': CharPosition.WrongChar,    // (r)ed [because here it's red]
+    '.': CharPosition.WrongChar,    // My original CLI version used this key
 }
 
 // =======================================
@@ -46,8 +53,9 @@ class ColourKeyboard {
             this.backspace();
             return;
         }
-        key = key.toLowerCase();
-        if (!Object.keys(CharToColour).includes(key)) {    // Only these colours allowed
+        
+        const colour = CharToColour[key.toLowerCase()];
+        if (colour == undefined) {
             return;
         }
 
@@ -56,7 +64,7 @@ class ColourKeyboard {
             return false;
         }
 
-        this.wordColours.push(key);
+        this.wordColours.push(colour);
     }
 
     backspace() {
@@ -122,7 +130,7 @@ class TypingController {
         // "Enter" progresses the state instead of modifying the
         // inputted characters.
         if (key == ENTER) {
-            this.#enter();
+            this.enter();
             return;
         }
 
@@ -145,8 +153,22 @@ class TypingController {
         );
     }
 
-    #enter() {
-        console.log("Cool you hit enter, doing nothing until you implement this");
+    enter() {
+        switch (this.state) {
+            case KeyboardState.Chars:
+                document.querySelector("#char-keyboard").classList.add("hidden");
+                document.querySelector("#colour-keyboard").classList.remove("hidden");
+                this.state = KeyboardState.Colours;
+                break;
+            case KeyboardState.Colours:
+                document.querySelector("#char-keyboard").classList.remove("hidden");
+                document.querySelector("#colour-keyboard").classList.add("hidden");
+                this.state = KeyboardState.Chars;
+                break;
+            default:
+                console.error(this.state);
+                throw new Error(`Unknown State: ${this.state}`);
+        }
     }
 
 }
@@ -176,10 +198,10 @@ class CurrentGuessDisplayer {
             const colour = colours[i] || CharPosition.Nothing;
             // First, remove any other colouring class that might've been there
             Object.values(CharPosition).forEach(possibleColour => {
-                characterElement.classList.remove(possibleColour.description)
+                characterElement.classList.remove(possibleColour)
             });
             // Then add the right one
-            characterElement.classList.add(colour.description);
+            characterElement.classList.add(colour);
             // Finally, insert the character
             characterElement.textContent = char.toUpperCase();
         }

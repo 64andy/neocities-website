@@ -1,3 +1,7 @@
+.hidden {
+    display: none !important;
+}
+
 .word-input-row {
     row-gap: 5px;
     column-gap: 5px;
@@ -14,31 +18,61 @@
     padding: 0px;
     line-height: 35px;
     text-align: center;
+    color: white;
 }
 
 .keyboard {
     display: flex;
+    margin: auto;
     align-items: center;
     flex-direction: column;
+    width: max-content;
 }
 
 .keyboard-row {
     display: flex;
+    width: 100%;
     flex-direction: row;
     align-items: center;
     align-content: space-around;
+    justify-content: center;
 }
 
-.keyboard-char {
+.keyboard-key {
+    text-align: center;
+}
+
+.char-key {
     font-size: x-large;
     border: 1px solid white;
     margin: 5px;
     width: 40px;
     height: 40px;
     line-height: 40px;
-    text-align: center;
+}
+
+.colour-key {
+    font-size: x-large;
+    border: 1px solid white;
+    margin: 3px;
+    line-height: 40px;
+    color: white;
+    width: 100%;
 }
 
 .special-char {
     font-size: small !important;
+}
+
+.char-correct {
+    background-color: green;
+}
+.char-wrong-spot {
+    background-color: hsl(61, 100%, 30%);
+}
+.char-wrong-char {
+    background-color: #a44;
+}
+.char-nothing {
+    background-color: #000;
 }
