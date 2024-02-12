@@ -21,6 +21,11 @@
     color: white;
 }
 
+.top-screen {
+    display: flex;
+    flex-direction: row;
+}
+
 .keyboard {
     display: flex;
     margin: auto;

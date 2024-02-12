@@ -13,9 +13,14 @@ permalink: /wordle-solver/
     </tr>
     </table>
 </div>
-<table class="display-board" id="display-board">
-    <!-- The JS will fill this up -->
-</table>
+<div class="top-screen">
+    <table class="display-board" id="display-board">
+        <!-- The JS will fill this up -->
+    </table>
+    <div id="answer-info">
+        ...
+    </div>
+</div>
 
 <div id="message-box">
     <span class="msg" id="input-word">Input your word</span>
@@ -77,6 +82,7 @@ permalink: /wordle-solver/
 </div>
 
 <link href="/css/wordle.css" rel="stylesheet" type="text/css" media="all">
+<script src="/js/wordle/wordle-words.js" type="text/javascript"></script>
 <script src="/js/wordle/wordle-solver.js" type="text/javascript"></script>
 <script>
     const rowTemplate = document
@@ -87,16 +93,17 @@ permalink: /wordle-solver/
     const renderer = new CurrentGuessDisplayer(rowTemplate, displayBoard);
     const colourKeyboard = new ColourKeyboard();
     const charKeyboard = new CharacterKeyboard();
-    const typingController = new TypingController(charKeyboard, colourKeyboard, renderer);
+    const solver = new Corpus(ALL_WORDS);
+    const game = new Game(charKeyboard, colourKeyboard, renderer, solver);
 
     // Enter characters when the user types
     document.onkeydown = (ev) => {
-        typingController.handleKey(ev.key);
+        game.handleKey(ev.key);
     }
 
     // Make the onscreen keys do something
     document.querySelectorAll(".keyboard-key").forEach((elem) => {
-        elem.onclick = () => typingController.handleKey(elem.dataset.key);
+        elem.onclick = () => game.handleKey(elem.dataset.key);
     })
 
     // Finally, render the first line
