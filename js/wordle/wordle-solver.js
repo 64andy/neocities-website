@@ -121,15 +121,17 @@ class CharacterKeyboard {
 class Game {
     /**
      * Handles the inputs & display of the solver
-     * @param {CharacterKeyboard} charKeyboard 
-     * @param {ColourKeyboard} colourKeyboard 
-     * @param {CurrentGuessDisplayer} renderer 
-     * @param {Corpus} solver 
+     * @param {CharacterKeyboard} charKeyboard
+     * @param {ColourKeyboard} colourKeyboard
+     * @param {CurrentGuessDisplayer} renderer
+     * @param {SuggestionDisplayer} answerRenderer
+     * @param {Corpus} solver
      */
-    constructor(charKeyboard, colourKeyboard, renderer, solver) {
+    constructor(charKeyboard, colourKeyboard, renderer, answerRenderer, solver) {
         this.charKeyboard = charKeyboard;
         this.colourKeyboard = colourKeyboard;
         this.renderer = renderer;
+        this.answerRenderer = answerRenderer;
         this.solver = solver;
         this.state = KeyboardState.Chars;
     }
@@ -185,10 +187,7 @@ class Game {
         const colours = this.colourKeyboard.wordColours;
         this.solver.refineAnswer(chars, colours)
         // Display what we know
-        document.querySelector("#answer-info").innerHTML = `
-            Possible answers: ${this.solver.possibleAnswers.length}<br>
-            Suggested: ${this.solver.suggestWord()}
-        `;
+        this.answerRenderer.display();
         // Get ready for the next round
         this.charKeyboard.reset();
         this.colourKeyboard.reset();
@@ -226,6 +225,7 @@ class CurrentGuessDisplayer {
     constructor(template, container) {
         this.template = template;
         this.container = container;
+        this.numRows = 0;
     }
 
     displayWord(word, colours) {
@@ -251,9 +251,42 @@ class CurrentGuessDisplayer {
 
     addNewRow() {
         const newRow = this.template.cloneNode(true);   // Deep clone
-        newRow.dataset.row = this.numRows;
+        newRow.dataset.row = ++this.numRows;
         this.container.append(newRow);
     }
+}
+
+class SuggestionDisplayer {
+    /** @type {HTMLElement} */ container;
+    /** @type {Corpus} */ solver;
+    static MAX_SIZE = 10;
+    constructor(container, solver) {
+        this.container = container;
+        this.solver = solver;
+    }
+
+    display() {
+        this.container.innerHTML = `Possible answers: ${this.solver.possibleAnswers.length}<br>`
+        if (this.solver.history.length == 0) {
+            this.container.innerHTML += "Please input your guess";
+        } else {
+            this.container.innerHTML += "<ul>";
+            this.solver.possibleAnswers
+                .sort((a, b) => this.solver.scoreWord(b) - this.solver.scoreWord(a))
+                .slice(0, SuggestionDisplayer.MAX_SIZE)
+                .forEach(word => {
+                    this.container.innerHTML += `<li>${word}</li>`;
+                });
+            if (this.solver.possibleAnswers.length > SuggestionDisplayer.MAX_SIZE) {
+                this.container.innerHTML += `
+                    <li>
+                        [... ${this.solver.possibleAnswers.length} others]
+                    </li>`;
+            }
+            this.container.innerHTML += "</ul>";
+        }
+    }
+
 }
 
 /**
@@ -271,23 +304,48 @@ class NumberRange {
     }
 
     /**
-     * Returns a new range containing the subrange that's part of both.
+     * Creates a new range with the subrange that's part of both.
+     * 
+     * If the two ranges don't overlap, it'll return `undefined`
      * @param {Range} other 
-     * @returns {Range}
+     * @returns {Range | undefined}
      */
     intersection(other) {
+        if (!this.isOverlapping(other)) {
+            return undefined;
+        }
         return new Range(
             Math.max(this.from, other.from),
             Math.min(this.to, other.to)
         );
     }
+
+    /**
+     * Checks if the two ranges overlap
+     * @param {NumberRange} other 
+     * @returns {boolean}
+     */
+    // https://bytes.com/topic/python/answers/457949-determing-whether-two-ranges-overlap#post1754426
+    isOverlapping(other) {
+        return (this.from <= other.from && other.from <= this.to)
+            || (other.from <= this.from && this.from <= other.to);
+    }
 }
+
+/**
+ * Represents a guess made by the user
+ * @typedef {Object} Corpus.Guess
+ * @property {string[]} word - The characters of the guess' word.
+ * @property {CharPosition[]} colours - The colours of the guess' word.
+ */
 
 /**
  * Contains all the possible answers to the current Wordle.
  * Refined down as the user gives us more hints.
  */
 class Corpus {
+    /** @type {Corpus.Guess[]} The guesses made by the user*/
+    history;
     /** @type {Array<string>} All the possible answers, shrinks over time*/
     possibleAnswers;
     /** @type {Array<Set<string>>} Has the possible characters at every position */
@@ -303,6 +361,7 @@ class Corpus {
     constructor(words) {
         this.possibleAnswers = [...words];
 
+        this.history = [];
         this.presentChars = [];
         this.unseenChars = new Set(ALL_CHARS);
         this.possibleWordChars = [];
@@ -328,6 +387,8 @@ class Corpus {
         if (!word.every(c => c.length == 1 && ALL_CHARS.includes(c))) {
             return;
         }
+
+        this.history.push({word: word, colours: colours});
         // They are no longer unseen :D
         for (const char of word) {
             this.unseenChars.delete(char)
@@ -398,6 +459,21 @@ class Corpus {
     }
 
     /**
+     * Scores words based on how many unseen characters it contains.
+     * @param {string} word The word we're scoring
+     * @returns {number}
+     */
+    scoreWord(word) {
+        let nUnseen = 0;
+        for (const char of new Set(word)) {
+            if (this.unseenChars.has(char)) {
+                nUnseen += 1;
+            }
+        }
+        return nUnseen;
+    }
+
+    /**
      * Returns the current 'best suited' word.
      * The 'best suited' word is one with the most unseen characters
      * @returns {string}
@@ -408,17 +484,9 @@ class Corpus {
         // Count the number of chars a given word has, which haven't been
         // seen before.
         // God I wish Javascript sets had intersections.
-        const overlap = w => {
-            let nUnseen = 0;
-            for (const char of new Set(w)) {
-                if (this.unseenChars.has(char)) {
-                    nUnseen += 1;
-                }
-            }
-            return nUnseen;
-        }
+
         for (const word of this.possibleAnswers) {
-            let nOverlap = overlap(word);
+            let nOverlap = this.scoreWord(word);
             if (nOverlap > bestUnseenChars) {
                 bestUnseenChars = nOverlap;
                 bestWord = word;

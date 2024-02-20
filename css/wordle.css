@@ -8,13 +8,13 @@
 }
 
 .word-char {
-    font-size: x-large;
+    font-size: xx-large;
     border: 1px solid lightskyblue;
     text-align: center;
     box-sizing: border-box;
     margin: 5px;
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     padding: 0px;
     line-height: 35px;
     text-align: center;
@@ -23,7 +23,32 @@
 
 .top-screen {
     display: flex;
+    flex-basis: 0;
     flex-direction: row;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+#message-box {
+    display: flex;
+    justify-self: flex-start;
+    justify-content: center;
+    background-color: purple;
+}
+
+.display-board {
+    display: grid;
+    height: 350px;
+    width: 40%;
+    overflow-y: auto;
+}
+
+#answer-info {
+    background-color: purple;
+}
+
+.keyboard-container {
+    width: 700px;
 }
 
 .keyboard {
@@ -48,12 +73,12 @@
 }
 
 .char-key {
-    font-size: x-large;
+    font-size: xx-large;
     border: 1px solid white;
     margin: 5px;
-    width: 40px;
-    height: 40px;
-    line-height: 40px;
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
 }
 
 .colour-key {
@@ -66,7 +91,7 @@
 }
 
 .special-char {
-    font-size: small !important;
+    font-size: medium !important;
 }
 
 .char-correct {
