@@ -6,8 +6,7 @@ permalink: /about/
 
 <h1 id="console-banner">Face for radio, voice for newsprint.</h1>
 
-+ Uni student
-+ 5'5" manlet? More like 5/5 man1337 ~~oh god i'm lonely~~
++ Computer Science Graduate
 + I like *Python*, I know *Java*, bit of C/C++, still learning HTML/CSS/JS
   + Hey what do you think's cuter? 
     [Fennecs](https://twitter.com/FennecsDaily)
