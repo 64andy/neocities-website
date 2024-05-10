@@ -269,22 +269,23 @@ class SuggestionDisplayer {
         this.container.innerHTML = `Possible answers: ${this.solver.possibleAnswers.length}<br>`
         if (this.solver.history.length == 0) {
             this.container.innerHTML += "Please input your guess";
-        } else {
-            this.container.innerHTML += "<ul>";
-            this.solver.possibleAnswers
-                .sort((a, b) => this.solver.scoreWord(b) - this.solver.scoreWord(a))
-                .slice(0, SuggestionDisplayer.MAX_SIZE)
-                .forEach(word => {
-                    this.container.innerHTML += `<li>${word}</li>`;
-                });
-            if (this.solver.possibleAnswers.length > SuggestionDisplayer.MAX_SIZE) {
-                this.container.innerHTML += `
-                    <li>
-                        [... ${this.solver.possibleAnswers.length} others]
-                    </li>`;
-            }
-            this.container.innerHTML += "</ul>";
+            return;
         }
+        // Build a list
+        this.container.innerHTML += "<ul>";
+        this.solver.possibleAnswers
+            .sort((a, b) => this.solver.scoreWord(b) - this.solver.scoreWord(a))
+            .slice(0, SuggestionDisplayer.MAX_SIZE)
+            .forEach(word => {
+                this.container.innerHTML += `<li>${word}</li>`;
+            });
+        if (this.solver.possibleAnswers.length > SuggestionDisplayer.MAX_SIZE) {
+            this.container.innerHTML += `
+                <li>
+                    [... ${this.solver.possibleAnswers.length} others]
+                </li>`;
+        }
+        this.container.innerHTML += "</ul>";
     }
 
 }
