@@ -20,22 +20,22 @@ const KeyboardState = {
  * @enum {String}
  */
 const CharPosition = {
-    Correct: 'char-correct',
-    CharInWrongPosition: 'char-wrong-spot',
-    WrongChar: 'char-wrong-char',
-    Nothing: 'char-nothing',
+    Unknown: 'char-nothing',            // Default state
+    Correct: 'char-correct',            // Char is in this spot
+    WrongPosition: 'char-wrong-spot',   // Char is elsewhere
+    WrongChar: 'char-wrong-char',       // Char isn't in this word
 }
 
 const CharToColour = {
     // Correct character correct spot
-    'g': CharPosition.Correct,      // (g)reen
+    'g': CharPosition.Correct,          // (g)reen
     // Correct character wrong spot
-    'y': CharPosition.CharInWrongPosition,    // (y)ellow
+    'y': CharPosition.WrongPosition,    // (y)ellow
     // Wrong character wrong spot
     // (Multiple bindings, just for me)
-    'b': CharPosition.WrongChar,    // (b)lack [in wordle it's black]
-    'r': CharPosition.WrongChar,    // (r)ed [because here it's red]
-    '.': CharPosition.WrongChar,    // My original CLI version used this key
+    'b': CharPosition.WrongChar,        // (b)lack [in wordle it's black]
+    'r': CharPosition.WrongChar,        // (r)ed [because here it's red]
+    '.': CharPosition.WrongChar,        // My original CLI version used this key
 }
 
 // =======================================
@@ -237,7 +237,7 @@ class CurrentGuessDisplayer {
                 throw new Error(`Couldn't find a box matching ".word-char[data-col='${i}']"`);
             }
             const char = word[i] || "";
-            const colour = colours[i] || CharPosition.Nothing;
+            const colour = colours[i] || CharPosition.Unknown;
             // First, remove any other colouring class that might've been there
             Object.values(CharPosition).forEach(possibleColour => {
                 characterElement.classList.remove(possibleColour)
@@ -330,6 +330,15 @@ class NumberRange {
         return (this.from <= other.from && other.from <= this.to)
             || (other.from <= this.from && this.from <= other.to);
     }
+
+    /**
+     * 
+     * @param {number} num 
+     * @returns 
+     */
+    includes(num) {
+        return this.from <= num <= this.other;
+    }
 }
 
 /**
@@ -380,7 +389,7 @@ class Corpus {
         // Correct lengths
         if (word.length != NUM_COLUMNS || colours.length != NUM_COLUMNS) {
             console.error(`Needed a ${NUM_COLUMNS} long word & colours, got `
-                            +`(word=${JSON.stringify(word)}, colours=${JSON.stringify(colours)})`)
+                        + `(word=${JSON.stringify(word)}, colours=${JSON.stringify(colours)})`)
             return;
         }
         // Ensure the word contains valid chars
@@ -402,7 +411,7 @@ class Corpus {
                     this.possibleWordChars[pos].clear()
                     this.possibleWordChars[pos].add(char);
                     break;
-                case CharPosition.CharInWrongPosition:
+                case CharPosition.WrongPosition:
                     // We know we should look for it again
                     this.presentChars.push(char);
                     this.possibleWordChars[pos].delete(char);
