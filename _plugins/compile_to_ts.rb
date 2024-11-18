@@ -49,6 +49,8 @@ class TSFile < Jekyll::StaticFile
     print "  compiling #{File.join(@dir, @name)}..."
     system("tsc",
       "--outFile", dest_path,
+      "--target", "es2020",
+      "--lib", "['dom']",
       @path
     )
     puts "done"

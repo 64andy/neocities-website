@@ -6,26 +6,25 @@ const BACKSPACE = "Backspace";
 
 /**
  * States if we're entering the word, or its colours 
- * @readonly
- * @enum {String}
  */
-const KeyboardState = {
-    Chars: "Chars",
-    Colours: "Colours",
+enum KeyboardState {
+    Chars,
+    Colours
 }
 
 /**
- * Represents how correct each character is (i.e. their colour)
- * @readonly
- * @enum {String}
+ * Represents how correct each character is (i.e. their colour).
+ * 
+ * Note: The enum values represent the CSS class of each type's style.
  */
-const CharPosition = {
-    Unknown: 'char-nothing',            // Default state
-    Correct: 'char-correct',            // Char is in this spot
-    WrongPosition: 'char-wrong-spot',   // Char is elsewhere
-    WrongChar: 'char-wrong-char',       // Char isn't in this word
+enum CharPosition {
+    Unknown = 'char-nothing',            // Default state
+    Correct = 'char-correct',            // Char is in this spot
+    WrongPosition = 'char-wrong-spot',   // Char is elsewhere
+    WrongChar = 'char-wrong-char',       // Char isn't in this word
 }
 
+/** [Colour keyboard]: Maps keys to colours, so you can type the colours */
 const CharToColour = {
     // Correct character correct spot
     'g': CharPosition.Correct,          // (g)reen
@@ -38,18 +37,29 @@ const CharToColour = {
     '.': CharPosition.WrongChar,        // My original CLI version used this key
 }
 
+
+/**
+ * Represents a guess made by the user
+ */
+interface PlayerGuess {
+    /** The word that the player guessed */
+    word: string;
+    /** The colours of each character in the word */
+    colours: CharPosition[];
+} 
+
 // =======================================
 // -------------- KEYBOARDS --------------
 // =======================================
 class ColourKeyboard {
-    /** @type {CharPosition[]} */
-    wordColours;
+    private wordColours: CharPosition[];
 
     constructor() {
         this.wordColours = [];
     }
 
-    receiveKey(key) {
+    /** Give this function the key which */
+    receiveKey(key: string) {
         // "Backspace" doesn't add a character, treat it differently
         if (key == BACKSPACE) {
             this.backspace();
@@ -69,6 +79,10 @@ class ColourKeyboard {
         this.wordColours.push(colour);
     }
 
+    getColours(): CharPosition[] {
+        return this.wordColours;
+    }
+
     backspace() {
         if (this.wordColours.length > 0) {
             this.wordColours.pop();
@@ -81,14 +95,13 @@ class ColourKeyboard {
 }
 
 class CharacterKeyboard {
-    /** @type {string[]} */
-    currentWord;
+    private currentWord: string[];
 
     constructor() {
         this.currentWord = []
     }
 
-    receiveKey(key) {
+    receiveKey(key: string) {
         // "Backspace" doesn't add a character, treat it differently
         if (key == BACKSPACE) {
             this.backspace();
@@ -107,6 +120,10 @@ class CharacterKeyboard {
         this.currentWord.push(key);
     }
 
+    getWord(): string {
+        return this.currentWord.join('');
+    }
+
     backspace() {
         if (this.currentWord.length > 0) {
             this.currentWord.pop();
@@ -121,13 +138,19 @@ class CharacterKeyboard {
 class Game {
     /**
      * Handles the inputs & display of the solver
-     * @param {CharacterKeyboard} charKeyboard
-     * @param {ColourKeyboard} colourKeyboard
-     * @param {CurrentGuessDisplayer} renderer
-     * @param {SuggestionDisplayer} answerRenderer
-     * @param {Corpus} solver
      */
-    constructor(charKeyboard, colourKeyboard, renderer, answerRenderer, solver) {
+    charKeyboard: CharacterKeyboard;
+    colourKeyboard: ColourKeyboard;
+    renderer: CurrentGuessDisplayer;
+    answerRenderer: SuggestionDisplayer;
+    solver: Corpus;
+    state: KeyboardState;
+
+    constructor(charKeyboard: CharacterKeyboard,
+                colourKeyboard: ColourKeyboard,
+                renderer: CurrentGuessDisplayer,
+                answerRenderer: SuggestionDisplayer,
+                solver: Corpus) {
         this.charKeyboard = charKeyboard;
         this.colourKeyboard = colourKeyboard;
         this.renderer = renderer;
@@ -161,30 +184,30 @@ class Game {
                 console.error(this.state);
                 throw new Error(`Unknown state`);
         }
-        this.renderer.displayWord(
-            this.charKeyboard.currentWord,
-            this.colourKeyboard.wordColours
-        );
+        this.renderer.displayWord({
+            word: this.charKeyboard.getWord(),
+            colours: this.colourKeyboard.getColours()
+        });
     }
 
-    #toColourState() {
-        document.querySelector("#char-keyboard").classList.add("hidden");
-        document.querySelector("#input-word").classList.add("hidden");
-        document.querySelector("#colour-keyboard").classList.remove("hidden");
-        document.querySelector("#input-colours").classList.remove("hidden");
+    private toColourState() {
+        document.querySelector("#char-keyboard")?.classList.add("hidden");
+        document.querySelector("#input-word")?.classList.add("hidden");
+        document.querySelector("#colour-keyboard")?.classList.remove("hidden");
+        document.querySelector("#input-colours")?.classList.remove("hidden");
         this.state = KeyboardState.Colours;
     }
 
-    #toCharsState() {
-        document.querySelector("#colour-keyboard").classList.add("hidden");
-        document.querySelector("#input-colours").classList.add("hidden");
-        document.querySelector("#char-keyboard").classList.remove("hidden");
-        document.querySelector("#input-word").classList.remove("hidden");
+    private toCharsState() {
+        document.querySelector("#colour-keyboard")?.classList.add("hidden");
+        document.querySelector("#input-colours")?.classList.add("hidden");
+        document.querySelector("#char-keyboard")?.classList.remove("hidden");
+        document.querySelector("#input-word")?.classList.remove("hidden");
         this.state = KeyboardState.Chars;
 
         // Send the answer to the solver
-        const chars = this.charKeyboard.currentWord;
-        const colours = this.colourKeyboard.wordColours;
+        const chars = this.charKeyboard.getWord();
+        const colours = this.colourKeyboard.getColours();
         this.solver.refineAnswer(chars, colours)
         // Display what we know
         this.answerRenderer.display();
@@ -197,13 +220,13 @@ class Game {
     enter() {
         switch (this.state) {
             case KeyboardState.Chars:
-                if (this.charKeyboard.currentWord.length == NUM_COLUMNS) {
-                    this.#toColourState();
+                if (this.charKeyboard.getWord().length == NUM_COLUMNS) {
+                    this.toColourState();
                 }
                 break;
             case KeyboardState.Colours:
-                if (this.colourKeyboard.wordColours.length == NUM_COLUMNS) {
-                    this.#toCharsState();
+                if (this.colourKeyboard.getColours().length == NUM_COLUMNS) {
+                    this.toCharsState();
                 }
                 break;
             default:
@@ -215,29 +238,32 @@ class Game {
 }
 
 class CurrentGuessDisplayer {
-    /** @type {HTMLElement} */ template;
-    /** @type {HTMLElement} */ container;
     /**
      * Used for displaying what the user's typed so far
-     * @param {HTMLElement} template 
-     * @param {HTMLElement} container 
      */
-    constructor(template, container) {
+    template: HTMLElement;
+    container: HTMLElement;
+    numRows: number;
+
+    constructor(template: HTMLElement, container: HTMLElement) {
         this.template = template;
         this.container = container;
         this.numRows = 0;
     }
 
-    displayWord(word, colours) {
+    displayWord(guess: PlayerGuess) {
         const rowElement = this.container.lastElementChild;
+        if (rowElement === null) {
+            throw new Error(`There are no "guess" rows being rendered, at least 1 is expected`);
+        }
         for (let i = 0; i < NUM_COLUMNS; i++) {
             // Where to render to
             const characterElement = rowElement.querySelector(`.word-char[data-col='${i}']`);
             if (characterElement == null) {
                 throw new Error(`Couldn't find a box matching ".word-char[data-col='${i}']"`);
             }
-            const char = word[i] || "";
-            const colour = colours[i] || CharPosition.Unknown;
+            const char = guess.word[i] || "";
+            const colour = guess.colours[i] || CharPosition.Unknown;
             // First, remove any other colouring class that might've been there
             Object.values(CharPosition).forEach(possibleColour => {
                 characterElement.classList.remove(possibleColour)
@@ -250,17 +276,18 @@ class CurrentGuessDisplayer {
     }
 
     addNewRow() {
-        const newRow = this.template.cloneNode(true);   // Deep clone
-        newRow.dataset.row = ++this.numRows;
-        this.container.append(newRow);
+        this.container.append(this.template.cloneNode(true));   // Deep copy
+        const newRow = this.container.querySelector<HTMLElement>(":last-child");
+        if (newRow == null) throw new Error("We just added a new row and it doesn't exist");
+        newRow.dataset.row = (++this.numRows).toString();
     }
 }
 
 class SuggestionDisplayer {
-    /** @type {HTMLElement} */ container;
-    /** @type {Corpus} */ solver;
+    container: HTMLElement;
+    solver: Corpus;
     static MAX_SIZE = 10;
-    constructor(container, solver) {
+    constructor(container: HTMLElement, solver: Corpus) {
         this.container = container;
         this.solver = solver;
     }
@@ -293,9 +320,11 @@ class SuggestionDisplayer {
  * Helper class for handling inclusive number ranges.
  */
 class NumberRange {
-    /** @type {number} The lower range inclusive */ from;
-    /** @type {number} The upper range inclusive */ to;
-    constructor(from, to) {
+    /** The lower range, inclusive */
+    from: number;
+    /** The upper range, inclusive */
+    to: number;
+    constructor(from: number, to: number) {
         if (from > to) {
             throw new RangeError(`LHS(${from}) can't be bigger than RHS(${to})`);
         }
@@ -304,17 +333,21 @@ class NumberRange {
     }
 
     /**
-     * Creates a new range with the subrange that's part of both.
+     * Returns a new range, which represents the numbers
+     * contained in both.
      * 
-     * If the two ranges don't overlap, it'll return `undefined`
-     * @param {Range} other 
-     * @returns {Range | undefined}
+     * @example
+     * let a = new NumberRange(0, 5); // [0,1,2,*3,4,5*]
+     * let b = new NumberRange(3, 8); // [*3,4,5*,6,7,8]
+     * a.intersection(b); // Returns (3, 5)
+     * 
+     * @returns The intersection, or `null` if they don't overlap 
      */
-    intersection(other) {
+    intersection(other: NumberRange): NumberRange | null {
         if (!this.isOverlapping(other)) {
-            return undefined;
+            return null;
         }
-        return new Range(
+        return new NumberRange(
             Math.max(this.from, other.from),
             Math.min(this.to, other.to)
         );
@@ -337,38 +370,28 @@ class NumberRange {
      * @returns 
      */
     includes(num) {
-        return this.from <= num <= this.other;
+        return this.from <= num && num <= this.to;
     }
 }
-
-/**
- * Represents a guess made by the user
- * @typedef {Object} Corpus.Guess
- * @property {string[]} word - The characters of the guess' word.
- * @property {CharPosition[]} colours - The colours of the guess' word.
- */
 
 /**
  * Contains all the possible answers to the current Wordle.
  * Refined down as the user gives us more hints.
  */
 class Corpus {
-    /** @type {Corpus.Guess[]} The guesses made by the user*/
-    history;
-    /** @type {Array<string>} All the possible answers, shrinks over time*/
-    possibleAnswers;
-    /** @type {Array<Set<string>>} Has the possible characters at every position */
-    possibleWordChars;
-    /** @type {Array<string>} Characters we know *must* be in the answer*/
-    presentChars;
-    /** @type {Set<string>} Characters we haven't seen yet (used to suggest)*/
-    unseenChars;
+    /** The guesses made by the user*/
+    history: PlayerGuess[];
+    /** All the possible answers, shrinks over time*/
+    possibleAnswers: Array<string>;
+    /** Has the possible characters at every position */
+    possibleWordChars: Array<Set<string>>;
+    /** Characters we know *must* be in the answer*/
+    presentChars: Array<string>;
+    /** Characters we haven't seen yet (used to suggest)*/
+    unseenChars: Set<string>;
 
-    /**
-     * @param {Array<string>} words 
-     */
-    constructor(words) {
-        this.possibleAnswers = [...words];
+    constructor(all_possible_wordle_answers: Array<string>) {
+        this.possibleAnswers = [...all_possible_wordle_answers];
 
         this.history = [];
         this.presentChars = [];
@@ -438,7 +461,7 @@ class Corpus {
         }
 
         // Finally, reduce the valid words with this new info
-        this.#reduce_valid_words()
+        this.reduce_valid_words()
     }
 
     /**
@@ -446,7 +469,7 @@ class Corpus {
      * @param {string} word 
      * @returns {boolean}
      */
-    #word_is_acceptable(word) {
+    private word_is_acceptable(word) {
         // Rule: Every "yellow" char is in the word
         if (!this.presentChars.every(c => word.includes(c))) {
             return false;
@@ -463,16 +486,16 @@ class Corpus {
         return true;
     }
 
-    #reduce_valid_words() {
-        this.possibleAnswers = this.possibleAnswers.filter(ans => this.#word_is_acceptable(ans));
+    private reduce_valid_words() {
+        this.possibleAnswers = this.possibleAnswers.filter(ans => this.word_is_acceptable(ans));
     }
 
     /**
-     * Scores words based on how many unseen characters it contains.
-     * @param {string} word The word we're scoring
-     * @returns {number}
+     * Heuristic function to sort follow-up suggestions.
+     * Scores words based on how many played characters it contains,
+     *   so the follow-up suggestions
      */
-    scoreWord(word) {
+    scoreWord(word: string): number {
         let nUnseen = 0;
         for (const char of new Set(word)) {
             if (this.unseenChars.has(char)) {
@@ -485,19 +508,16 @@ class Corpus {
     /**
      * Returns the current 'best suited' word.
      * The 'best suited' word is one with the most unseen characters
-     * @returns {string}
      */
-    suggestWord() {
-        let bestWord = undefined;
-        let bestUnseenChars = -1;
-        // Count the number of chars a given word has, which haven't been
-        // seen before.
-        // God I wish Javascript sets had intersections.
-
+    suggestWord(): string {
+        let bestWord: string = this.possibleAnswers[0];
+        let bestScore = -1;
+        
+        // Returns the highest scoring word of the `Corpus.scoreWord()` tester
         for (const word of this.possibleAnswers) {
-            let nOverlap = this.scoreWord(word);
-            if (nOverlap > bestUnseenChars) {
-                bestUnseenChars = nOverlap;
+            let score = this.scoreWord(word);
+            if (score > bestScore) {
+                bestScore = score;
                 bestWord = word;
             }
         }
