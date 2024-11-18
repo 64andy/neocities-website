@@ -497,7 +497,7 @@ class Corpus {
      */
     scoreWord(word: string): number {
         let nUnseen = 0;
-        for (const char of new Set(word)) {
+        for (const char of Array.from(new Set(word))) {
             if (this.unseenChars.has(char)) {
                 nUnseen += 1;
             }
