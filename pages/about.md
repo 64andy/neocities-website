@@ -4,15 +4,11 @@ title: Ode to Ego
 permalink: /about/
 ---
 
-<h1 id="console-banner">Face for radio, voice for newsprint.</h1>
+<h1 id="console-banner">My very own security questions cheatsheet</h1>
 
-+ Uni student
-+ 5'5" manlet? More like 5/5 man1337 ~~oh god i'm lonely~~
-+ I like *Python*, I know *Java*, bit of C/C++, still learning HTML/CSS/JS
-  + Hey what do you think's cuter? 
-    [Fennecs](https://twitter.com/FennecsDaily)
-    or
-    [Ferrets](https://twitter.com/kaho_ferrets)?
++ University graduate - Computer Science
++ My strongest languages are *Python & Java*, and I'm competent with *C/C++* and *JavaScript*  
+
 
 ===
 
