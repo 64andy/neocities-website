@@ -11,7 +11,7 @@ module TS_to_JS
     # This method is auto-run at build-time
     def generate(site)
       # First, check if we have TypeScript installed
-      if system("tsc") == nil then
+      if (system "tsc -v", out: File::NULL) == nil then
         Jekyll.logger.warn(
           "Missing dependency",
           "`tsc` is not installed on this machine, .ts files won't be compiled"
