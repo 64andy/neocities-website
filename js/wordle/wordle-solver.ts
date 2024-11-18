@@ -25,17 +25,16 @@ enum CharPosition {
 }
 
 /** [Colour keyboard]: Maps keys to colours, so you can type the colours */
-const CharToColour = {
-    // Correct character correct spot
-    'g': CharPosition.Correct,          // (g)reen
-    // Correct character wrong spot
-    'y': CharPosition.WrongPosition,    // (y)ellow
-    // Wrong character wrong spot
-    // (Multiple bindings, just for me)
-    'b': CharPosition.WrongChar,        // (b)lack [in wordle it's black]
-    'r': CharPosition.WrongChar,        // (r)ed [because here it's red]
-    '.': CharPosition.WrongChar,        // My original CLI version used this key
-}
+const CharToColour: Map<string, CharPosition> = new Map();
+// Correct character correct spot
+CharToColour.set('g', CharPosition.Correct);          // (g)reen
+// Correct character wrong spot
+CharToColour.set('y', CharPosition.WrongPosition);    // (y)ellow
+// Wrong character wrong spot
+// (Multiple bindings, just for me)
+CharToColour.set('b', CharPosition.WrongChar);        // (b)lack [in wordle it's black]
+CharToColour.set('r', CharPosition.WrongChar);        // (r)ed [because here it's red]
+CharToColour.set('.', CharPosition.WrongChar);        // My original CLI version used this key
 
 
 /**
@@ -66,7 +65,7 @@ class ColourKeyboard {
             return;
         }
         
-        const colour = CharToColour[key.toLowerCase()];
+        const colour = CharToColour.get(key.toLowerCase());
         if (colour == undefined) {
             return;
         }
@@ -161,9 +160,9 @@ class Game {
 
     /**
      * Sends the incoming key into the relevant keyboard
-     * @param {string} key A key stroke from the user/rendered keyboard
+     * @param key A key stroke from the user/rendered keyboard
      */
-    handleKey(key) {
+    handleKey(key: string) {
         // "Enter" progresses the state instead of modifying the
         // inputted characters.
         if (key == ENTER) {
@@ -355,21 +354,17 @@ class NumberRange {
 
     /**
      * Checks if the two ranges overlap
-     * @param {NumberRange} other 
-     * @returns {boolean}
      */
     // https://bytes.com/topic/python/answers/457949-determing-whether-two-ranges-overlap#post1754426
-    isOverlapping(other) {
+    isOverlapping(other: NumberRange): boolean {
         return (this.from <= other.from && other.from <= this.to)
             || (other.from <= this.from && this.from <= other.to);
     }
 
     /**
-     * 
-     * @param {number} num 
-     * @returns 
+     * Checks if the given number is within this range
      */
-    includes(num) {
+    includes(num: number): boolean {
         return this.from <= num && num <= this.to;
     }
 }
@@ -404,10 +399,10 @@ class Corpus {
 
     /**
      * 
-     * @param {string[]} word The characters of the word
-     * @param {CharPosition[]} colours The colours of the word
+     * @param word The characters of the word
+     * @param colours The colours of the word
      */
-    refineAnswer(word, colours) {
+    refineAnswer(word: string, colours: CharPosition[]) {
         // ## Input validation ##
         // Correct lengths
         if (word.length != NUM_COLUMNS || colours.length != NUM_COLUMNS) {
@@ -416,7 +411,7 @@ class Corpus {
             return;
         }
         // Ensure the word contains valid chars
-        if (!word.every(c => c.length == 1 && ALL_CHARS.includes(c))) {
+        if (!Array.from(word).every(c => c.length == 1 && ALL_CHARS.includes(c))) {
             return;
         }
 
@@ -465,11 +460,9 @@ class Corpus {
     }
 
     /**
-     * Checks if the given word fits the rules we've discovered
-     * @param {string} word 
-     * @returns {boolean}
+     * Checks if the given word is possible with the information we've learned.
      */
-    private word_is_acceptable(word) {
+    private word_is_acceptable(word: string): boolean {
         // Rule: Every "yellow" char is in the word
         if (!this.presentChars.every(c => word.includes(c))) {
             return false;
