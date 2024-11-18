@@ -27,24 +27,24 @@
     flex-direction: row;
     justify-content: space-between;
     gap: 10px;
+    height: 350px;
+}
+
+.top-sides {
+    width: 30%;
 }
 
 #message-box {
-    display: flex;
-    justify-self: flex-start;
-    justify-content: center;
-    background-color: purple;
+    font-size: large;
+    background-color: black;
+    text-align: center;
 }
 
 .display-board {
-    display: grid;
-    height: 350px;
+    display: flex;
+    flex-direction: column;
     width: 40%;
     overflow-y: auto;
-}
-
-#answer-info {
-    background-color: purple;
 }
 
 .keyboard-container {

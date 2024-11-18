@@ -4,7 +4,7 @@ title: Totally not cheating
 permalink: /wordle-solver/
 ---
 
-<div class="template-holder" style="display: none;">
+<div class="template-holder hidden">
     <table> <!-- So the tr doesn't get deleted for being invalid -->
     <tr class="word-input-row">
         {% for col in (0..4) %}
@@ -14,19 +14,21 @@ permalink: /wordle-solver/
     </table>
 </div>
 <div class="top-screen">
-    <div id="message-box">
-        <span class="msg" id="input-word">Input your word</span>
-        <span class="msg hidden" id="input-colours">Input your word's colours</span>
+    <div class="top-sides">
     </div>
     <table class="display-board" id="display-board">
         <!-- The JS will fill this up -->
     </table>
-    <div id="answer-info">
+    <div class="top-sides" id="answer-info">
         ...
     </div>
 </div>
 
 <br>
+<div id="message-box">
+    <span class="msg" id="input-word">Input your word</span>
+    <span class="msg hidden" id="input-colours">Input your word's colours</span>
+</div>
 
 <div class="keyboard-container">
     <div class="keyboard" id="char-keyboard">
