@@ -46,7 +46,7 @@ class TSFile < Jekyll::StaticFile
     dest_path = dest_path[0..-4] + ".js"
 
     # Run the TypeScript compiler in the shell.
-    print "  compiling #{File.join(@dir, @name)}..."
+    print "  compiling #{File.join(@dir, @name)} to #{dest_path}..."
     system("tsc",
       "--outFile", dest_path,
       @path
