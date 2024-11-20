@@ -381,7 +381,9 @@ class Corpus {
     /** Has the possible characters at every position */
     possibleWordChars: Array<Set<string>>;
     /** Characters we know *must* be in the answer*/
-    presentChars: Array<string>;
+    presentChars: Set<string>;
+    /** Characters we know *can't* be in the answer */
+    illegalCharacters: Set<string>;
     /** Characters we haven't seen yet (used to suggest)*/
     unseenChars: Set<string>;
 
@@ -389,7 +391,8 @@ class Corpus {
         this.possibleAnswers = [...all_possible_wordle_answers];
 
         this.history = [];
-        this.presentChars = [];
+        this.presentChars = new Set();
+        this.illegalCharacters = new Set();
         this.unseenChars = new Set(ALL_CHARS);
         this.possibleWordChars = [];
         for (let i = 0; i < NUM_COLUMNS; i++) {
@@ -431,22 +434,37 @@ class Corpus {
                     break;
                 case CharPosition.WrongPosition:
                     // We know we should look for it again
-                    this.presentChars.push(char);
+                    this.presentChars.add(char);
                     this.possibleWordChars[pos].delete(char);
                     break;
                 case CharPosition.WrongChar:
-                    // Being conservative, because "black" doesn't
+                    // `WrongChar` (black) doesn't
                     // necessarily mean "not in word".
                     // 
                     // If the word's "reach", and you guess "every", you'll
                     // get the colours "y..y.", where the 3rd pos states that
                     // e is black, despite being yellow previously.
                     //
-                    // Repeated character colours account for how many times
-                    // they occur in both your guess, and in the answer,
-                    // so we also need to do that (separately)
-                    // TODO: Account for duplicate chars 
-                    this.possibleWordChars[pos].delete(char);
+                    // First, check if the letter is repeated elsewhere in the word
+                    let letterValidElsewhereInWord = false;
+                    for (let j=0; j<NUM_COLUMNS; j++) {
+                        if (j === pos) continue;
+                        if (word[j] === char) {
+                            if (colour[j] === CharPosition.Correct || colour[j] === CharPosition.WrongPosition) {
+                                letterValidElsewhereInWord = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (letterValidElsewhereInWord) {
+                        // If it's valid elsewhere, then it's simply not valid here
+                        this.possibleWordChars[pos].delete(char);
+                    } else {
+                        // Otherwise, it's not in the word
+                        this.illegalCharacters.add(char);
+                    }
+
+
                     break;
             
                 default:
@@ -463,10 +481,23 @@ class Corpus {
      * Checks if the given word is possible with the information we've learned.
      */
     private word_is_acceptable(word: string): boolean {
-        // Rule: Every "yellow" char is in the word
-        if (!this.presentChars.every(c => word.includes(c))) {
-            return false;
+        // Rule: Every "yellow" char must be in the word
+        // e.g. If 'e' is yellow, then "plant" is invalid
+        for (const c of this.presentChars) {
+            if (!word.includes(c)) {
+                return false;
+            }
         }
+
+        // Rule: Black characters aren't allowed anywhere in the word
+        // e.g. 'crane -> .g..g', any words containing [c,a,n] aren't allowed
+        // (The quirks of repeated characters are handled by `refineAnswer()`)
+        for (const c of this.illegalCharacters) {
+            if (word.includes(c)) {
+                return false;
+            }
+        }
+
         // Rule: Every position must only contain characters that can be there.
         // e.g. If an 'e' was black/yellow there before, don't put 'e' there again.
         for (let i=0; i<NUM_COLUMNS; i++) {
