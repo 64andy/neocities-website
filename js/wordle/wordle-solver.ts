@@ -378,14 +378,16 @@ class Corpus {
     history: PlayerGuess[];
     /** All the possible answers, shrinks over time*/
     possibleAnswers: Array<string>;
-    /** Has the possible characters at every position */
-    possibleWordChars: Array<Set<string>>;
-    /** Characters we know *must* be in the answer*/
+    /** Characters that *can't* be in a given position */
+    illegalCharsAtPosition: Array<Set<string>>;
+    /** Characters that are *known* in the given slot */
+    knownCharactersAtPosition: Array<string | null>;
+    /** Characters we know *must* be in the answer */
     presentChars: Set<string>;
     /** Characters we know *can't* be in the answer */
     illegalCharacters: Set<string>;
-    /** Characters we haven't seen yet (used to suggest)*/
-    unseenChars: Set<string>;
+    /** Characters we've seen (used to suggest words) */
+    seenChars: Set<string>;
 
     constructor(all_possible_wordle_answers: Array<string>) {
         this.possibleAnswers = [...all_possible_wordle_answers];
@@ -393,10 +395,11 @@ class Corpus {
         this.history = [];
         this.presentChars = new Set();
         this.illegalCharacters = new Set();
-        this.unseenChars = new Set(ALL_CHARS);
-        this.possibleWordChars = [];
+        this.seenChars = new Set();
+        this.illegalCharsAtPosition = [];
+        this.knownCharactersAtPosition = Array(NUM_COLUMNS).fill(null);
         for (let i = 0; i < NUM_COLUMNS; i++) {
-            this.possibleWordChars.push(new Set(ALL_CHARS));
+            this.illegalCharsAtPosition.push(new Set());
         }
     }
 
@@ -421,21 +424,20 @@ class Corpus {
         this.history.push({word: word, colours: colours});
         // They are no longer unseen :D
         for (const char of word) {
-            this.unseenChars.delete(char)
+            this.seenChars.add(char)
         }
         for (let pos = 0; pos < NUM_COLUMNS; pos++) {
             let char = word[pos];
             let colour = colours[pos];
             switch (colour) {
                 case CharPosition.Correct:
-                    // There can only be one possible value for that spot.
-                    this.possibleWordChars[pos].clear()
-                    this.possibleWordChars[pos].add(char);
+                    // Yay we've found it
+                    this.knownCharactersAtPosition[pos] = char;
                     break;
                 case CharPosition.WrongPosition:
                     // We know we should look for it again
                     this.presentChars.add(char);
-                    this.possibleWordChars[pos].delete(char);
+                    this.illegalCharsAtPosition[pos].add(char);
                     break;
                 case CharPosition.WrongChar:
                     // `WrongChar` (black) doesn't
@@ -458,13 +460,11 @@ class Corpus {
                     }
                     if (letterValidElsewhereInWord) {
                         // If it's valid elsewhere, then it's simply not valid here
-                        this.possibleWordChars[pos].delete(char);
+                        this.illegalCharsAtPosition[pos].add(char);
                     } else {
                         // Otherwise, it's not in the word
                         this.illegalCharacters.add(char);
                     }
-
-
                     break;
             
                 default:
@@ -481,6 +481,15 @@ class Corpus {
      * Checks if the given word is possible with the information we've learned.
      */
     private word_is_acceptable(word: string): boolean {
+        // Rule: Green characters must have the same char
+        // in the same spot.
+        // e.g. 'crane -> .g..g', the word must have an [r,e] in the same spots.
+        for (const [pos, char] of this.knownCharactersAtPosition.entries()) {
+            if (char !== null && word[pos] !== char) {
+                return false;
+            }
+        }
+
         // Rule: Every "yellow" char must be in the word
         // e.g. If 'e' is yellow, then "plant" is invalid
         for (const c of this.presentChars) {
@@ -501,12 +510,11 @@ class Corpus {
         // Rule: Every position must only contain characters that can be there.
         // e.g. If an 'e' was black/yellow there before, don't put 'e' there again.
         for (let i=0; i<NUM_COLUMNS; i++) {
-            let char = word[i];
-            let validChars = this.possibleWordChars[i];
-            if (!validChars.has(char)) {
+            if (!this.illegalCharsAtPosition[i].has(word[i])) {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -522,7 +530,7 @@ class Corpus {
     scoreWord(word: string): number {
         let nUnseen = 0;
         for (const char of Array.from(new Set(word))) {
-            if (this.unseenChars.has(char)) {
+            if (this.seenChars.has(char)) {
                 nUnseen += 1;
             }
         }
