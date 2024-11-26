@@ -1,5 +1,4 @@
-# This plug-in replaces all static TypeScript files
-# with JavaScript.
+# This plug-in runs the TypeScript compiler
 #
 # https://jekyllrb.com/docs/plugins/generators/
 #
@@ -7,7 +6,11 @@
 # (I got here by poking at the static_file.rb source code)
 
 module CompileTS
-  class RunCompiler < Jekyll::Generator
+  # Generators are run first, before _site is built.
+  # On build, _site is cleared and files are copied over.
+  # If we were to run `tsc`, all output files would be deleted immediately.
+  # So, we add a fake static file that runs the compiler on copy.
+  class AddFakeCompilerFile < Jekyll::Generator
     # This method is auto-run at build-time
     def generate(site)
       # First, check if we have TypeScript installed
@@ -17,10 +20,21 @@ module CompileTS
           "`tsc` is not installed on this machine, .ts files won't be compiled"
         )
       else
-        Jekyll.logger.info("Compiling TypeScript")
-        system("echo The current working directory is: %cd%")
-        system("tsc --build --verbose")
+        site.static_files << TSFileCopier.new(site)
       end
+    end
+  end
+
+  # A fake file which runs the compiler instead of copying
+  class TSFileCopier < Jekyll::StaticFile
+    def initialize(site)
+      super(site, site.source, Dir.pwd, "Fake-Compiler_File")
+    end
+
+    # @Override
+    def write(dest_path)
+      Jekyll.logger.info("Compiling TypeScript")
+      system("tsc --build --verbose")
     end
   end
 end
