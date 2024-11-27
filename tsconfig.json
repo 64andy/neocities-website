@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig to read more about this file */
+    "incremental": true,
     "target": "ES2020",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
     "lib": ["dom", "ES2020"],                            /* Specify a set of bundled library declaration files that describe the target runtime environment. */
     "module": "commonjs",                                /* Specify what module code is generated. */
 
     "rootDir": "./js/",                                  /* Specify the root folder within your source files. */
-    "outDir": "./_site/js",                              /* Specify an output folder for all emitted files. */
+    "outDir": "./.ts_output/",                           /* Specify an output folder for all emitted files. */
 
     "esModuleInterop": true,                             /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
     "forceConsistentCasingInFileNames": true,            /* Ensure that casing is correct in imports. */

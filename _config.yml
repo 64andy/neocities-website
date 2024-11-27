@@ -50,5 +50,7 @@ exclude:
   - vendor/cache/
   - vendor/gems/
   - vendor/ruby/
+  - .ts_output/
+  - tsconfig.tsbuildinfo
   - tsconfig.json
   - "*.ts"

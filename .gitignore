@@ -7,6 +7,10 @@ _site
 # Temp folder when live-reloading
 _img
 
+# TypeScript output
+tsconfig.tsbuildinfo
+.ts_output/
+
 # Framework stuff
 .sass-cache
 .jekyll-cache

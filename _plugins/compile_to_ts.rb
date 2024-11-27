@@ -25,7 +25,7 @@ module CompileTS
     end
   end
 
-  # A fake file which runs the compiler instead of copying
+  # A fake file which runs the compiler when building the site
   class TSFileCopier < Jekyll::StaticFile
     def initialize(site)
       super(site, site.source, Dir.pwd, "Fake-Compiler_File")
@@ -33,8 +33,12 @@ module CompileTS
 
     # @Override
     def write(dest_path)
+      # We compile to a temporary folder, so `tsc` can compile
+      # incrementally and not have to recompile on every build/change.
       Jekyll.logger.info("Compiling TypeScript")
       system("tsc --build --verbose")
+      # Then copy over
+      FileUtils.copy_entry("./.ts_output/", "./_site/js/")
     end
   end
 end
