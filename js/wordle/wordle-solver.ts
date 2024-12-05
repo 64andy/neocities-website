@@ -510,7 +510,7 @@ class Corpus {
         // Rule: Every position must only contain characters that can be there.
         // e.g. If an 'e' was black/yellow there before, don't put 'e' there again.
         for (let i=0; i<NUM_COLUMNS; i++) {
-            if (!this.illegalCharsAtPosition[i].has(word[i])) {
+            if (this.illegalCharsAtPosition[i].has(word[i])) {
                 return false;
             }
         }
