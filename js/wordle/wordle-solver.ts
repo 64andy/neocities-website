@@ -36,6 +36,11 @@ CharToColour.set('b', CharPosition.WrongChar);        // (b)lack [in wordle it's
 CharToColour.set('r', CharPosition.WrongChar);        // (r)ed [because here it's red]
 CharToColour.set('.', CharPosition.WrongChar);        // My original CLI version used this key
 
+function panic(info: string): never {
+    console.error(info);
+    alert(info);
+    throw new Error(info);
+}
 
 /**
  * Represents a guess made by the user
@@ -52,6 +57,10 @@ interface PlayerGuess {
 // =======================================
 class ColourKeyboard {
     private wordColours: CharPosition[];
+    // Cyclic dependency warning.
+    // Hitting backspace when colours is empty should move you back to the CharKeyboard,
+    //   to do this the keyboard needs to reference the game.
+    public game: Game | undefined;
 
     constructor() {
         this.wordColours = [];
@@ -85,6 +94,10 @@ class ColourKeyboard {
     backspace() {
         if (this.wordColours.length > 0) {
             this.wordColours.pop();
+        } else {
+            // If you hit backspace in the colours state when no colours have been entered,
+            //  it should go back to the character keyboard
+            this.game?.toCharsState();
         }
     }
 
@@ -181,7 +194,7 @@ class Game {
             
             default:
                 console.error(this.state);
-                throw new Error(`Unknown state`);
+                panic(`Unknown state`);
         }
         this.renderer.displayWord({
             word: this.charKeyboard.getWord(),
@@ -189,7 +202,7 @@ class Game {
         });
     }
 
-    private toColourState() {
+    toColourState() {
         document.querySelector("#char-keyboard")?.classList.add("hidden");
         document.querySelector("#input-word")?.classList.add("hidden");
         document.querySelector("#colour-keyboard")?.classList.remove("hidden");
@@ -197,40 +210,45 @@ class Game {
         this.state = KeyboardState.Colours;
     }
 
-    private toCharsState() {
+    toCharsState() {
         document.querySelector("#colour-keyboard")?.classList.add("hidden");
         document.querySelector("#input-colours")?.classList.add("hidden");
         document.querySelector("#char-keyboard")?.classList.remove("hidden");
         document.querySelector("#input-word")?.classList.remove("hidden");
         this.state = KeyboardState.Chars;
-
-        // Send the answer to the solver
-        const chars = this.charKeyboard.getWord();
-        const colours = this.colourKeyboard.getColours();
-        this.solver.refineAnswer(chars, colours)
-        // Display what we know
-        this.answerRenderer.display();
-        // Get ready for the next round
-        this.charKeyboard.reset();
-        this.colourKeyboard.reset();
-        this.renderer.addNewRow();
     }
 
-    enter() {
+    /**
+     * A hook to be called whenever the user hits the enter button.
+     * 
+     * If we're in the "type characters" state, tries to move to the colours state.
+     * If we're in the "enter colours" state, it'll try to process the answer.
+     */
+    enter(): void {
         switch (this.state) {
             case KeyboardState.Chars:
                 if (this.charKeyboard.getWord().length == NUM_COLUMNS) {
+                    // Simply swap the keyboard
                     this.toColourState();
                 }
                 break;
             case KeyboardState.Colours:
                 if (this.colourKeyboard.getColours().length == NUM_COLUMNS) {
+                    // Send the answer to the solver
+                    const chars = this.charKeyboard.getWord();
+                    const colours = this.colourKeyboard.getColours();
+                    this.solver.refineAnswer(chars, colours);
+                    // Swap the keyboard
                     this.toCharsState();
+                    // Get ready for the next round
+                    this.answerRenderer.display();
+                    this.charKeyboard.reset();
+                    this.colourKeyboard.reset();
+                    this.renderer.addNewRow();
                 }
                 break;
             default:
-                console.error(this.state);
-                throw new Error(`Unknown State: ${this.state}`);
+                panic(`Unknown State: ${this.state}`);
         }
     }
 
@@ -253,13 +271,13 @@ class CurrentGuessDisplayer {
     displayWord(guess: PlayerGuess) {
         const rowElement = this.container.lastElementChild;
         if (rowElement === null) {
-            throw new Error(`There are no "guess" rows being rendered, at least 1 is expected`);
+            panic(`There are no "guess" rows being rendered, at least 1 is expected`);
         }
         for (let i = 0; i < NUM_COLUMNS; i++) {
             // Where to render to
             const characterElement = rowElement.querySelector(`.word-char[data-col='${i}']`);
             if (characterElement == null) {
-                throw new Error(`Couldn't find a box matching ".word-char[data-col='${i}']"`);
+                panic(`Couldn't find a box matching ".word-char[data-col='${i}']"`);
             }
             const char = guess.word[i] || "";
             const colour = guess.colours[i] || CharPosition.Unknown;
@@ -277,7 +295,7 @@ class CurrentGuessDisplayer {
     addNewRow() {
         this.container.append(this.template.cloneNode(true));   // Deep copy
         const newRow = this.container.querySelector<HTMLElement>(":last-child");
-        if (newRow == null) throw new Error("We just added a new row and it doesn't exist");
+        if (newRow == null) panic("We just added a new row and it doesn't exist");
         newRow.dataset.row = (++this.numRows).toString();
     }
 }
@@ -306,7 +324,7 @@ class SuggestionDisplayer {
             if (this.solver.possibleAnswers.length > SuggestionDisplayer.MAX_SIZE) {
                 this.container.innerHTML += `
                     <li>
-                        [... ${this.solver.possibleAnswers.length} others]
+                        [... ${this.solver.possibleAnswers.length - SuggestionDisplayer.MAX_SIZE} others]
                     </li>`;
             }
             this.container.innerHTML += "</ul>";
@@ -404,22 +422,14 @@ class Corpus {
     }
 
     /**
+     * Processes the user's guess, updating our knowledge base.
      * 
      * @param word The characters of the word
      * @param colours The colours of the word
      */
-    refineAnswer(word: string, colours: CharPosition[]) {
-        // ## Input validation ##
-        // Correct lengths
-        if (word.length != NUM_COLUMNS || colours.length != NUM_COLUMNS) {
-            console.error(`Needed a ${NUM_COLUMNS} long word & colours, got `
-                        + `(word=${JSON.stringify(word)}, colours=${JSON.stringify(colours)})`)
-            return;
-        }
-        // Ensure the word contains valid chars
-        if (!Array.from(word).every(c => c.length == 1 && ALL_CHARS.includes(c))) {
-            return;
-        }
+    refineAnswer(word: string, colours: CharPosition[]): void {
+
+        this.refineAnswerValidation(word, colours);
 
         this.history.push({word: word, colours: colours});
         // They are no longer unseen :D
@@ -469,12 +479,54 @@ class Corpus {
             
                 default:
                     console.error(colour);
-                    throw new Error("Unknown colour");
+                    panic(`Unknown colour: ${colour}`);
             }
         }
 
         // Finally, reduce the valid words with this new info
         this.reduce_valid_words()
+    }
+
+    refineAnswerValidation(word: string, colours: CharPosition[]): void|never {
+        // word and colours need to be the correct size
+        if (word.length != NUM_COLUMNS || colours.length != NUM_COLUMNS) {
+            panic(`Needed a ${NUM_COLUMNS} long word & colours, got `
+                        + `(word=${JSON.stringify(word)}, colours=${JSON.stringify(colours)})`)
+        }
+        // Ensure every char is a letter.
+        if (!Array.from(word).every(c => 
+                c.length == 1
+             && c === c.toLowerCase()
+             && ALL_CHARS.includes(c))
+            ) {
+            panic(`One of the letters in word (${JSON.stringify(word)}) isn't valid`);
+        }
+        // Ensure we're not contradicting ourselves in previous guesses
+        for (let i=0; i < NUM_COLUMNS; i++) {
+            const char = word[i];
+            switch (colours[i]) {
+                case CharPosition.Correct:
+                    // // WARNING: This will break if the word has repeated characters
+                    // if (this.illegalCharacters.has(char)) {
+                    //     panic(`'${char}' was previously marked as invalid, marking it`
+                    //         + ` green at position ${i+1} is a contradiction`
+                    //     );
+                    // }
+                    if (this.illegalCharsAtPosition[i].has(char)) {
+                        panic(`'${char}' at position ${i+1} was previously marked as yellow,`
+                            + ` having it green here is a contradiction`
+                        );
+                    }
+                    break;
+                case CharPosition.WrongChar:
+                    // // WARNING: This will break if the word has repeated characters
+                    // if (this.presentChars.has(char)) {
+                    //     panic(`'${char}' was previously marked as green, marking it`
+                    //         + ` black at position ${i+1} is a contradiction`);
+                    // }
+                    break;
+            }
+        }
     }
 
     /**

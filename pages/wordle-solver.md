@@ -109,6 +109,8 @@ permalink: /wordle-solver/
     const solver = new Corpus(ALL_WORDS);
     const suggestionRenderer = new SuggestionDisplayer(answerArea, solver);
     const game = new Game(charKeyboard, colourKeyboard, renderer, suggestionRenderer, solver);
+    // Cyclic dependency I know just... let me have this
+    colourKeyboard.game = game;
 
     // Enter characters when the user types
     document.onkeydown = (ev) => {
