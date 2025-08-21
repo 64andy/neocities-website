@@ -1,25 +1,42 @@
 /**
  * Gives a non-negative remainder
- * @param {number} lhs 
- * @param {number} rhs 
- * @returns {number} The remainder of `lhs / rhs`
  */
-function rem(lhs, rhs) {
+function rem(lhs: number, rhs: number): number {
     return ((lhs % rhs) + rhs) % rhs;
+}
+
+function panic(info: string): never {
+    console.error(info);
+    alert(info);
+    throw new Error(info);
+}
+
+/**
+ * Helper function because canvas.getContext can fail
+ * @param canvas The HTML &lt;canvas&gt; element
+ * @returns A 2D rendering context, fresh for the drawing.
+ */
+function getCanvas2dContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D | never {
+    const ctx = canvas.getContext('2d')
+                || panic("Couldn't get canvas context, your browser's too old!");
+    return ctx;
 }
 
 
 /** https://stackoverflow.com/a/46568146
- * Reads a file (from a form etc.), and returns it as an &lt;img>
+ * Reads a file (from a form etc.), and returns it as a HTML Image element
  * @param {File} file A file of an image 
- * @returns {Promise<HTMLImageElement>}
  */
-function readImage(file) {
+function readImage(file: File): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
         var fr = new FileReader();
         fr.onload = () => {
             let image = new Image();
-            image.src = fr.result;
+            // .result's type changes depending on the initiating function.
+            // Here, `.readAsDataURL()` ensures it's a string of B64.
+            // JS is a silly language :(
+            let result = fr.result as string;
+            image.src = result;
             image.onload = () => {
                 resolve(image);
             };
@@ -38,6 +55,8 @@ function readImage(file) {
     });
 }
 
+type Pixel = [number, number, number, number];
+
 /**
  * Doing image manipulation in JS is a nightmare, because you
  * can't modify pixels or even *read* pixels without converting it
@@ -46,15 +65,12 @@ function readImage(file) {
  * This wrapper class allows manipulation of individual pixels.
  */
 class ImgDataHelper {
-    /** 
-     * !!! You probably shouldn't directly call this !!!
-     * 
-     * Use one of the other constructors, like fromCanvas/fromFile/withSize etc.
-    */
-    constructor(imgData, imageSmoothing = true) {
-        /** @type {ImageData} */
+
+    public imgData: ImageData;
+    public imageSmoothing: boolean;
+
+    private constructor(imgData: ImageData, imageSmoothing = true) {
         this.imgData = imgData;
-        /** @type {boolean} */
         this.imageSmoothing = imageSmoothing;
     }
 
@@ -62,12 +78,10 @@ class ImgDataHelper {
     get height() { return this.imgData.height }
 
     /**
-     * Creates a copy of this instance, with the same dimensions
-     * but no pixels set.
-     * 
-     * @returns {ImgDataHelper}
+     * Creates a new instance, with the same dimensions
+     * but completely transparent.
     */
-    blankCopy() {
+    blankCopy(): ImgDataHelper {
         const data = new ImageData(this.width, this.height);
         return new ImgDataHelper(data, this.imageSmoothing);
     }
@@ -75,18 +89,14 @@ class ImgDataHelper {
     /**
      * Creates a new instance of ImgDataHelper, with the given width
      * and height, but no pixels set (image is transparent)
-     * @param {number} width 
-     * @param {number} height 
-     * @param {boolean} imageSmoothing (Default: true)
-     * Does the image blur when scaled
-     * @returns {ImgDataHelper}
+     * @param imageSmoothing Does the image blur when scaled (Default: true)
     */
-    static withSize(width, height, imageSmoothing = true) {
+    static withSize(width: number, height: number, imageSmoothing: boolean = true): ImgDataHelper {
         // I'm using a canvas because creating an ImageData
         // give a black image (because data is all 0's)
         const canvas = document.createElement('canvas'); canvas.width = width;
         canvas.height = height;
-        canvas.getContext('2d').imageSmoothingEnabled = imageSmoothing;
+        getCanvas2dContext(canvas).imageSmoothingEnabled = imageSmoothing;
         return ImgDataHelper.fromCanvas(canvas);
     }
 
@@ -96,30 +106,29 @@ class ImgDataHelper {
      * @param {HTMLCanvasElement} canvas 
      * @returns {ImgDataHelper}
     */
-    static fromCanvas(canvas) {
-        const ctx = canvas.getContext('2d');
+    static fromCanvas(canvas: HTMLCanvasElement): ImgDataHelper {
+        const ctx = getCanvas2dContext(canvas);
         const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
         return new ImgDataHelper(data, ctx.imageSmoothingEnabled);
     }
 
     /**
      * Turn a File object of an image into an ImgDataHelper
-     * @param {File} file An image file
-     * @param {boolean} imageSmoothing Whether the image will blur instead of
+     * @param file An image file
+     * @param imageSmoothing Whether the image will blur instead of
      * pixelating when scaled (Default: true)
-     * @param {number?} width The target width.
-     * @param {number?} height The target height.
-     * @returns {ImgDataHelper} 
+     * @param width The target width.
+     * @param height The target height.
      * @throws {string | Event | ProgressEvent<FileReader>}
      * String or Event if the image conversion failed, and ProgressEvent if the file read failed.
     */
-    static async fromFile(file, imageSmoothing = true, width = undefined, height = undefined) {
+    static async fromFile(file: File, imageSmoothing: boolean = true, width?: number, height?: number): Promise<ImgDataHelper> {
         const img = await readImage(file);
         width = (width === undefined) ? img.width : width;
         height = (height === undefined) ? img.height : height;
         // Pasting the image onto a canvas is the only way to read its pixels.
         const canvas = document.createElement('canvas')
-        const ctx = canvas.getContext('2d');
+        const ctx = getCanvas2dContext(canvas);
         canvas.width = width;
         canvas.height = height;
         ctx.imageSmoothingEnabled = imageSmoothing;
@@ -132,14 +141,14 @@ class ImgDataHelper {
      * 
      * @returns {HTMLCanvasElement} A canvas with this object's image painted on
     */
-    toCanvas(width = null, height = null) {
+    toCanvas(width = null, height = null): HTMLCanvasElement {
         const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
+        const ctx = getCanvas2dContext(canvas);
         canvas.width = (width !== null) ? width : this.width;
         canvas.height = (height !== null) ? height : this.height;
         ctx.imageSmoothingEnabled = this.imageSmoothing;
         if (canvas.width == this.width && canvas.height == this.height) {
-            canvas.getContext('2d').putImageData(this.imgData, 0, 0);
+            ctx.putImageData(this.imgData, 0, 0);
         } else {
             this.drawOntoCanvas(canvas);
         }
@@ -150,7 +159,7 @@ class ImgDataHelper {
      * 
      * @returns {[number, number]}
      */
-    toXY(u, v) {
+    toXY(u: number, v: number): [number, number] {
         let x = Math.round(u * (this.width - 1));
         let y = Math.round(v * (this.height - 1));
         return [x, y];
@@ -160,35 +169,35 @@ class ImgDataHelper {
      * 
      * @returns {[number, number]}
      */
-    toUV(x, y) {
+    toUV(x: number, y: number): [number, number] {
         let u = x / (this.width - 1);
         let v = y / (this.height - 1);
         return [u, v];
     }
     /**
      * Gets the RGBA pixel at the given position
-     * @returns {[number, number, number, number]} An RGBA pixel
+     * @returns {Pixel} An RGBA pixel
      */
-    getPixel(x, y) {
+    getPixel(x: number, y: number): Pixel {
         const pos = this._arrayPos(x, y)
-        const px = this.imgData.data.slice(pos, pos + 4);
-        return px;
+        const data = this.imgData.data;
+        return [data[pos+0], data[pos+1], data[pos+2], data[pos+3]];
     }
     /**
      * Gets the RGBA pixel at the given **UV position**
-     * @returns {[number, number, number, number]} An RGBA pixel
+     * @returns An RGBA pixel
      */
-    getPixelUV(u, v) {
+    getPixelUV(u: number, v: number): Pixel {
         const [x, y] = this.toXY(u, v);
         return this.getPixel(x, y);
     }
     /**
      * Writes the RGBA values to a pixel at the given position
-     * @param {[number, number, number, number]} px An RGBA pixel
-     * @param {number} x 
-     * @param {number} y 
+     * @param px An RGBA pixel
+     * @param x The 
+     * @param y 
      */
-    writePixel(px, x, y) {
+    writePixel(px: Pixel, x: number, y: number): void {
         let pos = this._arrayPos(x, y);
         for (let i = 0; i < 4; i++) {       // RGBA, 4 bytes per pixel
             this.imgData.data[pos + i] = px[i];
@@ -196,12 +205,9 @@ class ImgDataHelper {
     }
 
     /**
-     * Creates a new instance of this image, with a new size
-     * @param {number} newWidth 
-     * @param {number} newHeight 
-     * @returns {ImgDataHelper}
+     * Creates a new instance of this image, with a new size (Image will get stretched/strunk)
      */
-    resized(newWidth, newHeight) {
+    resized(newWidth: number, newHeight: number): ImgDataHelper {
         const canvas = document.createElement('canvas');
         canvas.width = newWidth;
         canvas.height = newHeight;
@@ -209,6 +215,9 @@ class ImgDataHelper {
         return ImgDataHelper.fromCanvas(canvas);
     }
 
+
+    drawOntoCanvas(target: HTMLCanvasElement): void;
+    drawOntoCanvas(target: HTMLCanvasElement, dx: number, dy: number): void;
     /**
      * Pastes this image onto another canvas.
      * 
@@ -218,28 +227,29 @@ class ImgDataHelper {
      * 
      * If left blank, it'll stretch this image across the target canvas.
      * 
-     * @param {HTMLCanvasElement} target The canvas which gets drawn onto
-     * @param {...number} posArgs Position args fed into drawImage()
+     * @param target The canvas which gets drawn onto
+     * @param dx the pixel x-pos where the output's drawn
+     * @param dy the pixel y-pos where the output's drawn
+     * 
     */
-    drawOntoCanvas(target, ...posArgs) {
+    drawOntoCanvas(target: HTMLCanvasElement, dx?: number, dy?: number): void {
         const thisAsCanvas = this.toCanvas();
-        const ctx = target.getContext('2d');
+        const ctx = getCanvas2dContext(target);
         // Change the base canvas imageSmoothing. We'll revert later
         const oldSmoothing = ctx.imageSmoothingEnabled;
         ctx.imageSmoothingEnabled = this.imageSmoothing;
-        if (posArgs.length === 0) {
+        if (dx !== undefined && dy !== undefined) {
+            ctx.drawImage(thisAsCanvas, dx, dy);
+        } else {
             // Stretch over target
             ctx.drawImage(thisAsCanvas, 0, 0, target.width, target.height);
-        } else {
-            ctx.drawImage(thisAsCanvas, ...posArgs);
         }
         ctx.imageSmoothingEnabled = oldSmoothing;
     }
 
-    /** @private */
-    _arrayPos(x, y) {
+    private _arrayPos(x: number, y: number) {
         // Wrapping policy - Repeat
-        if (!Number.isInteger(x) || !Number.isInteger(y)) alert("FUCK YOU PROVIDE INTS")
+        if (!Number.isInteger(x) || !Number.isInteger(y)) panic("FUCK YOU PROVIDE INTS")
         x = rem(x, this.width);
         y = rem(y, this.height);
         return (y * this.width + x) * 4
@@ -257,8 +267,8 @@ const ImageManipulations = {
      * 0 means no warp, 1 means full warp.
      * @returns {ImgDataHelper} A new image, freshly warped.
      */
-    roundedWarp(src, strength) {
-        const _warp = (x) => {
+    roundedWarp(src: ImgDataHelper, strength: number): ImgDataHelper {
+        const _warp = (x: number) => {
             // The corrective warp algorithm with interpolation.
             const offset = 0.5 + (Math.asin(2 * x - 1)) / Math.PI;
             const lerp = (offset * strength) + (x * (1 - strength));
@@ -278,14 +288,13 @@ const ImageManipulations = {
     },
     /**
      * Applies an elliptical crop to the image.
-     * @param {ImgDataHelper} src 
-     * @param {number} size A number from [0, 1], determining the crop radius.
+     * @param size A number from [0, 1], determining the crop radius.
      * 0 touches the edges, shrinking into nothing at 1. (default: 0) 
-     * @returns {ImgDataHelper} A new image, freshly cropped.
+     * @returns A new image, freshly cropped.
      */
-    roundedCrop(src, size = 0) {
+    roundedCrop(src: ImgDataHelper, size: number = 0): ImgDataHelper {
         const output = document.createElement('canvas');
-        const ctx = output.getContext('2d')
+        const ctx = getCanvas2dContext(output);
         output.width = src.width;
         output.height = src.height;
         ctx.imageSmoothingEnabled = src.imageSmoothing
@@ -312,9 +321,9 @@ const ImageManipulations = {
      * @param {number} lineAngle The angle of the split [0, 360]. (Default: 0)
      * @returns {ImgDataHelper} The freshly output image
      */
-    splitImageOverlay(leftImg, rightImg, width, height, lineAngle=0) {
+    splitImageOverlay(leftImg: ImgDataHelper, rightImg: ImgDataHelper, width: number, height: number, lineAngle: number=0): ImgDataHelper {
         const output = document.createElement('canvas');
-        const ctx = output.getContext('2d');
+        const ctx = getCanvas2dContext(output);
         output.width = width;
         output.height = height;
         lineAngle = lineAngle * Math.PI / 180;
@@ -337,4 +346,4 @@ const ImageManipulations = {
     }
 }
 
-export { ImgDataHelper, ImageManipulations };
+export { ImgDataHelper, ImageManipulations, Pixel, getCanvas2dContext };

@@ -14,30 +14,31 @@ permalink: /flag-pfp/
     <!-- The controls -->
     <div class="flag-input">
       <form onsubmit="return false">
+        <h3>Foreground:</h6>
         <label for="pfp">Add profile pic </label>
         <input type="file" id="pfp" name="pfp" accept="image/*"
           onchange="formEvents.applyPfp()" />
-
         <br />
+
+        <label for="radius">Flag radius </label>
+        <input type="range" min=-40 max=90 value=5 id="radius" name="radius"
+          oninput="formEvents.updateRadius()" />
+        <label for="radius" id='radius-display'>...</label>
+        <br />
+
+        <hr>
+        <h3>Background:</h6>
 
         <label for="flag">Add LHS flag </label>
         <input type="file" id="left-flag" name="left flag" accept="image/*"
           onchange="formEvents.applyLeftFlag()" />
-
         <br />
 
         <label for="flag">Add RHS flag </label>
         <input type="file" id="right-flag" name="right flag" accept="image/*"
           onchange="formEvents.applyRightFlag()" />
-
-        <br /><br />
-        
-        <label for="radius">Flag radius </label>
-        <input type="range" min=0 max=100 value=5 id="radius" name="radius"
-          oninput="formEvents.updateRadius()" />
-        <label for="radius" id='radius-display'>...</label>
-        
         <br />
+        
 
         <label for="strength">Warp strength </label>
         <input type="range" min=0 max=100 value=70 id="strength" name="strength" 
