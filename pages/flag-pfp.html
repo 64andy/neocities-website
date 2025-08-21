@@ -13,11 +13,14 @@ permalink: /flag-pfp/
 
     <!-- The controls -->
     <div class="flag-input">
-      <form onsubmit="return false">
         <h3>Foreground:</h6>
         <label for="pfp">Add profile pic </label>
-        <input type="file" id="pfp" name="pfp" accept="image/*"
-          onchange="formEvents.applyPfp()" />
+        <!-- Wrap in a form so we can form clear -->
+        <form onreset="formEvents.applyPfp(true)">
+          <input type="file" id="pfp" name="pfp" accept="image/*"
+            onchange="formEvents.applyPfp()" />
+          <button type="reset" style="color: red">X</button>
+        </form>
         <br />
 
         <label for="radius">Flag radius </label>
@@ -30,13 +33,19 @@ permalink: /flag-pfp/
         <h3>Background:</h6>
 
         <label for="flag">Add LHS flag </label>
+        <form onreset="formEvents.applyLeftFlag(true)">
         <input type="file" id="left-flag" name="left flag" accept="image/*"
           onchange="formEvents.applyLeftFlag()" />
+          <button type="reset" style="color: red">X</button>
+        </form>
         <br />
 
         <label for="flag">Add RHS flag </label>
-        <input type="file" id="right-flag" name="right flag" accept="image/*"
+        <form onreset="formEvents.applyRightFlag(true)">
+          <input type="file" id="right-flag" name="right flag" accept="image/*"
           onchange="formEvents.applyRightFlag()" />
+          <button type="reset" style="color: red">X</button>
+        </form>
         <br />
         
 
@@ -59,7 +68,6 @@ permalink: /flag-pfp/
         <label for="cropped">Crop the whole image? </label>
         <input type="checkbox" name="cropped" id="cropped" checked
           onchange="formEvents.updateFlagCrop()" />
-      </form>
     </div>
   </div>
 

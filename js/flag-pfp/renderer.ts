@@ -95,12 +95,12 @@ class ProfileImageRenderer {
     warpStrength: number;
     angle: number;
   };
-  public layers: {
+  private layers: {
     leftFlag?: ImgDataHelper;
     rightFlag?: ImgDataHelper;
     pfp?: ImgDataHelper;
   };
-  public cache: CachedProfileImage;
+  private cache: CachedProfileImage;
 
   constructor() {
     this.imageSettings = {

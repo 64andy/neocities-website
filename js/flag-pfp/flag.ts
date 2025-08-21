@@ -33,7 +33,7 @@ const elems = {
  * Turns the file into an image, and saves it to
  * the global `Images` object with a key of imgName.
  */
-async function _fileToImage(file: File, imgName: 'leftFlag' | 'rightFlag' | 'pfp', imageSmoothing = true, width?: number, height?: number) {
+async function _fileToImage(file: File | undefined, imgName: 'leftFlag' | 'rightFlag' | 'pfp', imageSmoothing = true, width?: number, height?: number) {
     let img;
     if (file != undefined) {
         img = await ImgDataHelper.fromFile(file, imageSmoothing, width, height);
@@ -54,18 +54,20 @@ async function _fileToImage(file: File, imgName: 'leftFlag' | 'rightFlag' | 'pfp
 
 // Method namespace: Contains events bound to the form
 const formEvents = {
-    async applyPfp() {
+    async applyPfp(clear=false) {
         const files = elems.pfpUpload.files || panic("pfp isn't a file upload input; site's broken!");
-        await _fileToImage(files[0], 'pfp', true, mainCanvas.width, mainCanvas.height);
+        const file = (clear ? undefined : files[0]);
+        await _fileToImage(file, 'pfp', true, mainCanvas.width, mainCanvas.height);
     },
-    async applyLeftFlag() {
+    async applyLeftFlag(clear=false) {
         const files = elems.leftFlagUpload.files || panic("left-flag isn't a file upload input; site's broken!");
-        await _fileToImage(files[0], 'leftFlag', false, mainCanvas.width, mainCanvas.width);
+        const file = (clear ? undefined : files[0])
+        await _fileToImage(file, 'leftFlag', false, mainCanvas.width, mainCanvas.width);
     },
-    async applyRightFlag() {
+    async applyRightFlag(clear=false) {
         const files = elems.rightFlagUpload.files || panic("right-flag isn't a file upload input; site's broken!");
-        await _fileToImage(files[0], 'rightFlag', false, mainCanvas.width, mainCanvas.height);
-
+        const file = (clear ? undefined : files[0])
+        await _fileToImage(file, 'rightFlag', false, mainCanvas.width, mainCanvas.height);
     },
 
     async updateRadiusDisplay() {
