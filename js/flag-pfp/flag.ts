@@ -145,19 +145,19 @@ function renderPfp(canvas: HTMLCanvasElement) {
         ctx.fillText(
             "no",
             (canvas.width / 2) - (no.width/2),
-            (canvas.height - textHeight) / 2 - 50
+            (canvas.height + textHeight) / 2 - 30
         );
         ctx.fillStyle = "#9B4F96";
         ctx.fillText(
             "images", 
             (canvas.width - images.width) / 2, 
-            (canvas.height - textHeight) / 2
+            (canvas.height + textHeight) / 2
         );
         ctx.fillStyle = "#0038A8";
         ctx.fillText(
             "added", 
             (canvas.width / 2) - (added.width/2), 
-            (canvas.height - textHeight) / 2 + 50
+            (canvas.height + textHeight) / 2 + 30
         );
     }
 
